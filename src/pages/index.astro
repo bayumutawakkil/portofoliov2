@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Navbar from '../components/Navbar.astro';
+import Projects from '../components/Projects.astro';
+import Skills from '../components/Skills.astro';
+import { getCreativeProfile } from '../lib/portfolio-data';
+
+const profile = await getCreativeProfile();
+---
+
+<BaseLayout>
+	<Navbar />
+	<Hero profile={profile} />
+	<Projects />
+	<Skills />
+</BaseLayout>

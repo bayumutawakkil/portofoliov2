@@ -1,0 +1,127 @@
+---
+// Skills.astro — Technology skills grid dengan animated badges
+
+const skillGroups = [
+  {
+    category: 'Frontend',
+    skills: [
+      { name: 'React',       icon: '⚛️',  level: 95 },
+      { name: 'TypeScript',  icon: '🔷',  level: 90 },
+      { name: 'Next.js',     icon: '▲',   level: 88 },
+      { name: 'Astro',       icon: '🚀',  level: 82 },
+      { name: 'Three.js',    icon: '🔮',  level: 75 },
+      { name: 'Tailwind',    icon: '🎨',  level: 92 },
+    ],
+  },
+  {
+    category: 'Backend',
+    skills: [
+      { name: 'Node.js',   icon: '🟢', level: 85 },
+      { name: 'Bun',       icon: '🍞', level: 78 },
+      { name: 'Hono',      icon: '🔥', level: 80 },
+      { name: 'Postgres',  icon: '🐘', level: 75 },
+      { name: 'Redis',     icon: '⚡', level: 70 },
+      { name: 'GraphQL',   icon: '◈',  level: 72 },
+    ],
+  },
+  {
+    category: 'Tools & DevOps',
+    skills: [
+      { name: 'Git',       icon: '⑂',   level: 95 },
+      { name: 'Docker',    icon: '🐳',  level: 80 },
+      { name: 'Figma',     icon: '✦',   level: 85 },
+      { name: 'Vercel',    icon: '▲',   level: 88 },
+      { name: 'Vitest',    icon: '✓',   level: 78 },
+      { name: 'Turborepo', icon: '⚙️', level: 72 },
+    ],
+  },
+];
+---
+
+<section id="skills" class="relative py-16 md:py-24 lg:py-32" aria-labelledby="skills-heading">
+  <!-- Background glow -->
+  <div
+    class="absolute right-0 bottom-0 w-[500px] h-[500px] rounded-full pointer-events-none"
+    style="background: radial-gradient(circle, rgba(129,140,248,0.04) 0%, transparent 70%);"
+    aria-hidden="true"
+  ></div>
+
+  <div class="section-container">
+    <!-- Section header -->
+    <div class="mb-16">
+      <div class="section-label">
+        03 / Skills
+      </div>
+      <h2
+        id="skills-heading"
+        class="font-display text-4xl sm:text-5xl font-bold mb-4"
+        style="font-family: 'Syne', sans-serif; color: #f8fafc;"
+      >
+        Tech <span class="text-gradient-cyber">Stack</span>
+      </h2>
+      <p class="text-base max-w-lg" style="color: #94a3b8;">
+        Technologies and tools I wield daily — from pixel-perfect UIs to scalable backends.
+      </p>
+    </div>
+
+    <!-- Skill groups -->
+    <div class="space-y-16">
+      {skillGroups.map((group) => (
+        <div>
+          <!-- Group label -->
+          <div class="flex items-center gap-4 mb-8">
+            <h3
+              class="font-mono text-xs tracking-widest uppercase"
+              style="color: #38bdf8;"
+            >
+              {group.category}
+            </h3>
+            <div class="flex-1 h-px" style="background: linear-gradient(to right, rgba(56,189,248,0.2), transparent);"></div>
+          </div>
+
+          <!-- Skills grid -->
+          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            {group.skills.map((skill) => (
+              <div class="skill-badge" aria-label={`${skill.name} — ${skill.level}% proficiency`}>
+                <span class="icon" aria-hidden="true">{skill.icon}</span>
+                <span>{skill.name}</span>
+                <!-- Mini progress bar -->
+                <div
+                  class="w-full rounded-full overflow-hidden mt-1"
+                  style="height: 2px; background: rgba(56,189,248,0.1);"
+                >
+                  <div
+                    class="h-full rounded-full"
+                    style={`width: ${skill.level}%; background: linear-gradient(to right, #0ea5e9, #38bdf8);`}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Bottom highlight bar -->
+    <div
+      class="mt-12 md:mt-20 p-6 md:p-8 glass-card relative overflow-hidden"
+    >
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="background: linear-gradient(135deg, rgba(56,189,248,0.04) 0%, transparent 60%);"
+        aria-hidden="true"
+      ></div>
+      <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div>
+          <p class="font-display text-2xl font-bold mb-1" style="font-family: 'Syne', sans-serif; color: #f8fafc;">
+            Always <span class="text-gradient-cyber">Learning</span>
+          </p>
+          <p class="text-sm" style="color: #94a3b8;">Currently exploring: Rust, WASM, and AI-assisted UI generation.</p>
+        </div>
+        <a href="#contact" class="btn-cyber flex-shrink-0">
+          <span>Let's Build Together</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
