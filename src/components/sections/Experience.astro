@@ -1,0 +1,23 @@
+---
+import { experience } from '../../data/site';
+import SectionHeading from '../ui/SectionHeading.astro';
+---
+<section class="experience section-pad" id="experience" aria-labelledby="experience-title">
+  <SectionHeading number="04 — EXPERIENCE" aside="LEARNING IN PUBLIC" />
+  <div class="experience-heading">
+    <h2 id="experience-title">Learning through<br /><span>real systems.</span></h2>
+    <p>Pengalaman saya tumbuh dari proses belajar, membangun, dan menguji gagasan dalam konteks akademik serta proyek yang sedang berjalan.</p>
+  </div>
+  <ol class="experience-list">
+    {experience.map((item) => (
+      <li class="experience-row">
+        <span class="experience-period">{item.period}</span>
+        <div>
+          <h3>{item.title}</h3>
+          <p>{item.organization}</p>
+        </div>
+        <p>{item.detail}</p>
+      </li>
+    ))}
+  </ol>
+</section>

@@ -1,0 +1,19 @@
+---
+import { galleryProjects } from '../../data/project-gallery';
+import ProjectCard from './ProjectCard.astro';
+---
+<section class="work-section section-pad" id="work" aria-labelledby="work-title">
+  <div class="work-intro">
+    <h2 id="work-title">Works</h2>
+    <p>Selected projects</p>
+  </div>
+  <div class="works-stage" data-drag-gallery role="region" aria-roledescription="carousel" aria-label="Selected projects" tabindex="0">
+    <div class="works-stage-top"><span>02 — SELECTED PROJECTS</span><span data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span></div>
+    <div class="project-list" data-gallery-track>
+      {galleryProjects.map((project, index) => <ProjectCard project={project} index={index} />)}
+    </div>
+    <button class="works-nav works-nav-prev" type="button" data-gallery-prev aria-label="Previous project">←</button>
+    <button class="works-nav works-nav-next" type="button" data-gallery-next aria-label="Next project">→</button>
+  </div>
+  <div class="work-foot"><span>2023 — 2026</span><a href="https://github.com/bayumutawakkil" target="_blank" rel="noreferrer">VIEW ALL WORK <span>↗</span></a></div>
+</section>

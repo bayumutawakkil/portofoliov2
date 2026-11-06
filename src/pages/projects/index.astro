@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import { galleryProjects } from '../../data/project-gallery';
+---
+<BaseLayout title="Works — Bayu Mutawakkil" description="A selection of systems, experiments, and digital work.">
+  <div class="projects-gallery-page">
+    <Nav />
+    <main class="projects-gallery" data-drag-gallery role="region" aria-roledescription="carousel" aria-labelledby="gallery-title" tabindex="0">
+      <a class="gallery-back" href="/">← Back home</a>
+      <div class="gallery-heading">
+        <p>PROJECT ARCHIVE / {galleryProjects.length} WORKS</p>
+        <h1 id="gallery-title">WORKS</h1>
+        <span class="gallery-count" data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span>
+      </div>
+      <div class="gallery-track-wrap">
+        <div class="gallery-track" data-gallery-track>
+          {galleryProjects.map((project, index) => (
+            <a
+              href={`/projects/${project.slug}`}
+              class={`gallery-card gallery-card-${project.accent}`}
+              data-gallery-card
+              data-index={index}
+              aria-label={`Open ${project.title} project`}
+            >
+              <span class="gallery-card-number">{String(index + 1).padStart(2, '0')}</span>
+              <div class="gallery-card-image">
+                <img src={project.image} alt="" loading={index < 2 ? 'eager' : 'lazy'} style={`object-position:${project.position}`} />
+                <span class="gallery-card-mark">↗</span>
+              </div>
+              <div class="gallery-card-meta">
+                <h2>{project.title}</h2>
+                <span>{project.year}</span>
+                <small>{project.category}</small>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+      <div class="gallery-footer">
+        <span>DRAG / SWIPE / ARROW KEYS TO EXPLORE</span>
+        <span class="gallery-footer-line"></span>
+        <div class="gallery-nav-group">
+          <button class="works-nav" type="button" data-gallery-prev aria-label="Previous project">←</button>
+          <button class="works-nav" type="button" data-gallery-next aria-label="Next project">→</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</BaseLayout>

@@ -1,43 +1,36 @@
-# Astro Starter Kit: Minimal
+# Bayu Mutawakkil — Portfolio
 
-```sh
-npm create astro@latest -- --template minimal
+A static-first personal portfolio built with Astro, Tailwind CSS, GSAP, ScrollTrigger, Lenis, and SplitType.
+
+## Requirements
+- Node.js 20.3+ (recommended)
+- npm
+
+## Run locally
+```bash
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Open the local URL printed by Astro (usually http://localhost:4321).
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+## Production build
+```bash
+npm run build
+npm run preview
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Customize your content
+1. Edit `src/data/site.ts` to update profile, capabilities, and experience metadata.
+2. Add or edit Markdown case studies in `src/content/projects/`. The schema is defined in `src/content/config.ts`.
+3. Edit `src/pages/index.astro` and the components in `src/components/sections/` to change the narrative.
+4. Edit `src/styles/global.css` for visual tokens, responsive rules, and component styling.
+5. Edit `tailwind.config.mjs` if you want to extend the utility palette.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Notes
+- The project uses Astro components, native routing, and content collections without a React runtime.
+- Project detail pages are generated at `/projects/[slug]/` from Markdown content.
+- GSAP, Lenis, and SplitType are initialized in `src/scripts/main.ts` on Astro page-load and cleaned up before view transitions.
+- The project cards currently use CSS-built illustrative previews. Replace these with real screenshots when available.
+- Replace the placeholder LinkedIn URL and public email before publishing.
+- Project descriptions are based on known project context; verify their public status and replace repository links with exact project URLs.

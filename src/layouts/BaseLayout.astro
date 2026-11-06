@@ -1,85 +1,57 @@
 ---
-// BaseLayout.astro - Root layout dengan SEO, fonts, dan dark-mode class
 import '../styles/global.css';
-
-export interface Props {
-  title?: string;
-  description?: string;
-  ogImage?: string;
-}
-
+import { ClientRouter } from 'astro:transitions';
 const {
-  title = 'Bayu Mutawakkil — Creative Frontend Developer',
-  description = 'Portofolio pribadi seorang Frontend Developer yang berfokus pada pengalaman pengguna yang indah, performa tinggi, dan inovasi teknis.',
-  ogImage = '/og-image.png',
+  title = 'Bayu Mutawakkil — Software Developer',
+  description = 'Personal portfolio of Bayu Mutawakkil, Information Systems student and software developer.',
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://bayumutawakkil.dev');
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(Astro.url.pathname, siteUrl).toString();
+const ogImage = new URL('/bg-hero.jpg', siteUrl).toString();
 ---
-
 <!doctype html>
-<html lang="id" class="dark scroll-smooth">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
-
-    <!-- SEO Primary -->
-    <title>{title}</title>
+    <meta name="theme-color" content="#07111f" />
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalURL} />
+    <link rel="canonical" href={canonical} />
 
-    <!-- Open Graph -->
-    <meta property="og:type"        content="website" />
-    <meta property="og:url"         content={canonicalURL} />
-    <meta property="og:title"       content={title} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bayu Mutawakkil" />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image"       content={ogImage} />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:title"       content={title} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content="Bayu Mutawakkil — software developer portfolio" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image"       content={ogImage} />
+    <meta name="twitter:image" content={ogImage} />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!-- Google Fonts: Inter + Syne + JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-bg-primary text-ice-white font-sans antialiased overflow-x-hidden">
-    <!-- Scan-line ambient overlay -->
-    <div class="pointer-events-none fixed inset-0 z-0">
-      <div class="absolute inset-0 bg-cyber-gradient opacity-100"></div>
-      <div class="absolute inset-0 bg-hero-radial"></div>
-    </div>
-
-    <!-- Main content -->
-    <main class="relative z-10">
-      <slot />
-    </main>
-
-    <!-- Lenis smooth scroll init -->
-    <script>
-      import Lenis from 'lenis';
-
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
+    <title>{title}</title>
+    <ClientRouter />
+    <script is:inline>
+      // Reveal animations only run when JS is available. If the module fails to
+      // boot, the load fallback removes the class so content is never stuck hidden.
+      document.documentElement.classList.add('js-ready');
+      window.addEventListener('load', () => {
+        if (!document.documentElement.dataset.motionReady) {
+          document.documentElement.classList.remove('js-ready');
+        }
       });
-
-      function raf(time: number) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-      }
-      requestAnimationFrame(raf);
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <slot />
+    <script>
+      import '../scripts/main.ts';
     </script>
   </body>
 </html>

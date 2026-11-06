@@ -1,0 +1,32 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+---
+<BaseLayout title={`${project.data.title} — Bayu Mutawakkil`} description={project.data.summary}>
+  <Nav />
+  <main class="project-detail section-pad">
+    <a class="detail-back" href="/#work"><ArrowLeft size={14} aria-hidden="true" /> Back to selected work</a>
+    <div class={`detail-visual project-${project.data.accent}`} aria-hidden="true">
+      <span>{project.data.category}</span>
+      <strong>{project.data.title}</strong>
+      <small>{project.data.year} / {project.data.status}</small>
+    </div>
+    <article class="detail-copy">
+      <p class="eyebrow">CASE STUDY / {project.data.year}</p>
+      <h1>{project.data.title}</h1>
+      <p class="detail-summary">{project.data.summary}</p>
+      <div class="detail-tags">{project.data.stack.map((tag) => <span>{tag}</span>)}</div>
+      <div class="detail-prose"><Content /></div>
+      <a class="button-primary" href={project.data.externalUrl} target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={16} aria-hidden="true" /></a>
+    </article>
+  </main>
+</BaseLayout>

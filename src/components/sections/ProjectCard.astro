@@ -1,0 +1,20 @@
+---
+import type { GalleryProject } from '../../data/project-gallery';
+interface Props { project: GalleryProject; index: number; }
+const { project, index } = Astro.props;
+---
+<article class={`project-card project-${project.accent}`} data-project-card data-category={project.category} data-gallery-card data-index={index}>
+  <a class="project-card-link" href={`/projects/${project.slug}`} aria-label={`Read case study: ${project.title}`}>
+    <div class="project-visual">
+      <img src={project.image} alt="" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" style={`object-position:${project.position}`} />
+      <div class="project-visual-wash"></div>
+      <div class="visual-top"><span>CASE STUDY / {String(index + 1).padStart(2, '0')}</span><span>{project.year}</span></div>
+      <span class="visual-watermark">{String(index + 1).padStart(2, '0')}</span>
+      <span class="visual-open">OPEN PROJECT <b>↗</b></span>
+    </div>
+    <div class="project-info">
+      <div class="project-meta"><span>{project.category}</span><span>{project.year}</span></div>
+      <div class="project-title-row"><h3>{project.title}</h3><span class="project-link" aria-hidden="true">↗</span></div>
+    </div>
+  </a>
+</article>

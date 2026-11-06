@@ -1,0 +1,16 @@
+---
+const isHome = Astro.url.pathname === '/';
+const anchor = (id: string) => isHome ? `#${id}` : `/#${id}`;
+---
+<header class="site-header" data-header>
+  <a class="brand" href={isHome ? '#top' : '/'} aria-label="Bayu Mutawakkil home"><span class="brand-mark">B<span>.</span></span><span class="brand-name">BAYU MUTAWAKKIL</span></a>
+  <nav class="desktop-nav" aria-label="Main navigation">
+    <a href={anchor('about')}>About</a><a href={anchor('work')}>Selected work</a><a href={anchor('expertise')}>Expertise</a><a href={anchor('contact')}>Contact</a>
+  </nav>
+  <a class="header-availability" href={anchor('contact')}><span class="status-dot"></span> Available for opportunities</a>
+  <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><span></span><span></span></button>
+</header>
+<div class="mobile-menu" id="site-menu" aria-label="Mobile navigation" data-mobile-menu>
+  <a href={anchor('about')}>About <span>01</span></a><a href={anchor('work')}>Selected work <span>02</span></a><a href={anchor('expertise')}>Expertise <span>03</span></a><a href={anchor('contact')}>Contact <span>05</span></a>
+  <p>INFORMATION SYSTEMS × SOFTWARE ENGINEERING</p>
+</div>
