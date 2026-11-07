@@ -146,7 +146,7 @@ html.is-fullpage [data-fullpage-section][data-fullpage-scroll] {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Every homepage panel is both a snap target and at least one visible panel tall. */
+/* Every homepage panel is at least one visible panel tall (desktop/fullpage baseline). */
 .hero,
 .manifesto,
 #work.work-section,
@@ -161,6 +161,9 @@ html.is-fullpage [data-fullpage-section][data-fullpage-scroll] {
 }
 /* Hero overrides: it has its own justify via hero-main padding */
 .hero { justify-content: space-between; }
+
+/* Strict presentasi dipertahankan di semua perangkat (termasuk mobile).
+   Penyesuaian mobile dilakukan via Tailwind max-lg: di markup, tetap fit di 100dvh. */
 
 /* work-section must not clip its own overflow so the snap container     */
 /* (window / Lenis) can detect its boundaries correctly.                 */
@@ -297,6 +300,10 @@ html.is-fullpage #work.work-section {
   .works-nav { height: 40px; width: 40px; }
   .works-nav-prev { left: 6px; }
   .works-nav-next { right: 6px; }
+}
+@media (max-width: 1023px) {
+  /* Kartu ~80vw agar kartu berikutnya mengintip (isyarat swipe) */
+  #work .project-card { flex-basis: 80vw; }
 }
 
 /* Architecture additions */

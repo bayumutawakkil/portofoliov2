@@ -250,14 +250,15 @@ const init = () => {
       cursorCleanup = () => window.removeEventListener('pointermove', move);
     }
 
-    // ── Reduced motion ────────────────────────────────────────────────
+    // ── Reduced motion: tampilkan semua, tanpa animasi/Observer ───────
     if (reduceMotion) {
+      document.documentElement.classList.remove('is-fullpage');
       document.querySelectorAll<HTMLElement>('.project-card, .reveal-up, [data-reveal-text]').forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
       cleanup = () => { menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); ctx.revert(); };
       return;
     }
 
-    // ── Split hero title (runs on load) ───────────────────────────────
+    // ── Split hero title (desktop only; elemen mobile/hero stepped tidak memakai [data-split]) ──
     const splitInstances: SplitType[] = [];
     document.querySelectorAll<HTMLElement>('[data-split]').forEach(el => {
       const split = new SplitType(el, { types: 'chars', tagName: 'span' });
@@ -265,7 +266,8 @@ const init = () => {
       gsap.from(split.chars, { yPercent: 115, opacity: 0, rotateX: -45, stagger: 0.025, duration: 1.05, ease: 'power4.out', delay: 0.25 });
     });
 
-    // ── Homepage fullpage (GSAP Observer, strict: no overflow) ────────
+    // ── Homepage fullpage (Desktop only >=1024px via matchMedia; Mobile = native scroll) ─
+    // GSAP Observer + overflow-hidden hanya di desktop.
     const fullpageRoot = document.querySelector<HTMLElement>('main[data-fullpage], main[data-snap-scroll]');
     if (fullpageRoot) {
       const fullpage = initFullpage(fullpageRoot);
@@ -278,7 +280,7 @@ const init = () => {
       return;
     }
 
-    // ── Non-homepage / fallback: Lenis + ScrollTrigger reveals ────────
+    // ── Non-homepage: Lenis + ScrollTrigger reveals ───────────────────
     document.documentElement.classList.remove('is-fullpage');
     const lenis = new Lenis({ duration: 0.86, smoothWheel: true, wheelMultiplier: 0.82 });
     lenis.on('scroll', ScrollTrigger.update);

@@ -2,20 +2,21 @@
 import { galleryProjects } from '../../data/project-gallery';
 import ProjectCard from './ProjectCard.astro';
 ---
-<!-- strict layout: overflow-hidden; wheel vertikal di atas slider tetap tembus ke GSAP Observer (no stopPropagation) -->
+<!-- Desktop: strict 100dvh dengan fullpage/Observer. Mobile: fluid, stacked, native scroll. -->
 <section
-  class="work-section section-pad relative h-[calc(100dvh-var(--nav-h))] max-h-[calc(100dvh-var(--nav-h))] min-h-0 flex flex-col overflow-hidden [will-change:transform]"
+  class="work-section section-pad relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden [will-change:transform]"
   id="work"
   aria-labelledby="work-title"
 >
-  <!-- Judul absolute center + inverter (mix-blend), di luar flow; pointer-events-none agar drag slider tidak terganggu -->
-  <div class="pointer-events-none absolute top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 text-center mix-blend-difference text-white">
-    <h2 id="work-title" class="m-0 mt-2 font-[var(--display)] text-[clamp(56px,11vw,180px)] font-semibold leading-[0.82] tracking-[-0.07em]">Projects</h2>
+  <!-- Judul: mobile statis in-flow di atas slider; desktop absolute center + inverter -->
+  <div class="pointer-events-none relative top-0 left-0 z-10 shrink-0 translate-x-0 translate-y-0 pt-2 text-center [mix-blend-mode:normal] lg:absolute lg:left-1/2 lg:top-1/2 lg:z-50 lg:w-full lg:-translate-x-1/2 lg:-translate-y-1/2 lg:pt-0 lg:mix-blend-difference lg:text-white">
+    <span class="block font-[var(--mono)] text-[10px] tracking-[0.16em] text-[#6f93b5] opacity-90 lg:text-white">02 — SELECTED PROJECTS</span>
+    <h2 id="work-title" class="m-0 mt-1 font-[var(--display)] text-[clamp(2rem,9vw,3.25rem)] font-semibold leading-[0.86] tracking-[-0.06em] text-[#e9f2fc] lg:mt-2 lg:text-[clamp(56px,11vw,180px)] lg:leading-[0.82] lg:tracking-[-0.07em] lg:text-white">Projects</h2>
   </div>
 
-  <!-- Slider: flex-1 + items-center => presisi di tengah vertikal (judul sudah absolute) -->
+  <!-- Slider: flex-1 + min-h-0 agar muat 100dvh; swipe horizontal untuk geser proyek -->
   <div class="works-stage relative flex min-h-0 w-full flex-1 items-center" data-drag-gallery role="region" aria-roledescription="carousel" aria-label="Selected projects" tabindex="0">
-    <div class="works-stage-top"><span>DRAG HORIZONTAL</span><span data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span></div>
+    <div class="works-stage-top"><span data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span></div>
     <div class="project-list" data-gallery-track>
       {galleryProjects.map((project, index) => <ProjectCard project={project} index={index} />)}
     </div>
@@ -23,5 +24,5 @@ import ProjectCard from './ProjectCard.astro';
     <button class="works-nav works-nav-next" type="button" data-gallery-next aria-label="Next project">→</button>
   </div>
 
-  <div class="work-foot z-[6] shrink-0 pt-[clamp(8px,1.4vh,16px)]"><span>2023 — 2026</span><a href="https://github.com/bayumutawakkil" target="_blank" rel="noreferrer">VIEW ALL PROJECTS <span>↗</span></a></div>
+  <div class="work-foot z-[6] shrink-0 pt-[clamp(6px,1.2vh,14px)]"><span>2023 — 2026</span><a href="https://github.com/bayumutawakkil" target="_blank" rel="noreferrer">VIEW ALL PROJECTS <span>↗</span></a></div>
 </section>

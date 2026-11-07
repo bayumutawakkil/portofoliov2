@@ -82,12 +82,24 @@ export const experience = [
     period: 'CURRENT',
     title: 'Information Systems Student',
     organization: 'Universitas Andalas',
-    detail: 'Mempelajari bagaimana teknologi, proses bisnis, data, dan organisasi bekerja sebagai satu sistem.',
+    detail: 'Mempelajari bagaimana teknologi, proses bisnis, data, dan organisasi bekerja sebagai satu sistem yang saling terhubung.',
   },
   {
     period: 'ONGOING',
     title: 'Software Development Practice',
-    organization: 'Personal and academic projects',
-    detail: 'Membangun dan mengeksplorasi aplikasi web, sistem informasi, analitik data, serta interface engineering.',
+    organization: 'Personal & academic projects',
+    detail: 'Membangun dan mengeksplorasi aplikasi web, sistem informasi, analitik data, serta interface engineering dari masalah nyata.',
+  },
+  {
+    period: '2025',
+    title: 'Systems & Process Exploration',
+    organization: 'Campus initiatives',
+    detail: 'Menerjemahkan kebutuhan operasional menjadi alur kerja, model data, dan rancangan solusi digital yang lebih terstruktur.',
+  },
+  {
+    period: 'EXPLORING',
+    title: 'Data & Interface Engineering',
+    organization: 'Independent learning',
+    detail: 'Mendalami machine learning, visualisasi insight, dan detail interaksi antarmuka untuk pengalaman yang jelas dan berguna.',
   },
 ] as const;

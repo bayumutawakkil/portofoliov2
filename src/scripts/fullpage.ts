@@ -1,28 +1,164 @@
 import { gsap } from 'gsap';
 import { Observer } from 'gsap/Observer';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(Observer);
+gsap.registerPlugin(Observer, ScrollTrigger);
 
 export type FullpageController = { destroy: () => void } | undefined;
 
 /**
- * Fullpage presentasi (GSAP Observer) + stepped Hero.
- * - Tinggi panel presisi = calc(100dvh - var(--nav-h)) (navbar fixed). Jarak Y GSAP = tinggi panel aktual.
- * - Panel strict: overflow hidden. Panel [data-fullpage-scroll] eksplisit (jika ada): native scroll + edge-gating.
- * - Wheel vertikal di atas [data-drag-gallery]/slider tetap ditangkap Observer (tidak ada stopPropagation) => pindah section.
+ * Fullpage presentasi (GSAP Observer) — HANYA DESKTOP (>=1024px).
+ * Mobile (<1024px): native vertical scroll, tanpa Observer/fullpage.
+ * - Panel presisi = calc(100dvh - var(--nav-h)); jarak Y GSAP = tinggi panel aktual.
+ * - Panel strict: overflow hidden. [data-fullpage-scroll] (jika ada): native scroll + edge-gating.
+ * - Gestur: swipe/scroll vertikal => pindah section. Swipe horizontal / gestur di atas
+ *   [data-drag-gallery] tidak memicu pindah section (slider meng-handle horizontal).
+ * - Reduced-motion: Observer nonaktif.
  * - Animasi GSAP hanya properti kompositor (x/y/opacity/scale/percent).
  */
 export function initFullpage(root: HTMLElement): FullpageController {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion) return;
 
+  // Hanya aktifkan fullpage/Observer di desktop (>= 1024px)
+  const mm = gsap.matchMedia();
+  
+  mm.add('(min-width: 1024px)', () => {
+    const ctrl = initFullpageDesktop(root);
+    return () => ctrl?.destroy();
+  });
+
+  // Mobile (< 1024px): ScrollTrigger Entrance Animation (Fade-up on Scroll)
+  mm.add('(max-width: 1023px)', () => {
+    // 1. Judul Section & Manifesto
+    const sectionHeadings = document.querySelectorAll<HTMLElement>(
+      '#about .section-heading, #about .manifesto-title, #about .manifesto-copy, #principles .section-heading, #principles .principles-title, #principles .principle-list, #contact .section-heading, #contact .contact-content, #work .work-intro, #work .work-foot, #expertise h2, #experience h2'
+    );
+    sectionHeadings.forEach((el) => {
+      el.style.willChange = 'transform, opacity';
+      gsap.fromTo(
+        el,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            once: true,
+          },
+        }
+      );
+    });
+
+    // 2. Project Slider
+    const workStage = document.querySelector<HTMLElement>('#work .works-stage');
+    if (workStage) {
+      workStage.style.willChange = 'transform, opacity';
+      gsap.fromTo(
+        workStage,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: workStage,
+            start: 'top 85%',
+            once: true,
+          },
+        }
+      );
+    }
+
+    // 3. Bento Grid Cards (#expertise) dengan stagger: 0.15
+    const bentoCards = document.querySelectorAll<HTMLElement>('#expertise article');
+    if (bentoCards.length > 0) {
+      bentoCards.forEach((c) => { c.style.willChange = 'transform, opacity'; });
+      gsap.fromTo(
+        bentoCards,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out',
+          stagger: 0.15,
+          scrollTrigger: {
+            trigger: '#expertise',
+            start: 'top 85%',
+            once: true,
+          },
+        }
+      );
+    }
+
+    // 4. Experience Rows (#experience) dengan stagger: 0.15
+    const expRows = document.querySelectorAll<HTMLElement>('#experience article');
+    if (expRows.length > 0) {
+      expRows.forEach((r) => { r.style.willChange = 'transform, opacity'; });
+      gsap.fromTo(
+        expRows,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out',
+          stagger: 0.15,
+          scrollTrigger: {
+            trigger: '#experience',
+            start: 'top 85%',
+            once: true,
+          },
+        }
+      );
+    }
+  });
+
+  return {
+    destroy() {
+      mm.revert();
+    },
+  };
+}
+
+function initFullpageDesktop(root: HTMLElement): FullpageController {
+
   const footer = document.querySelector<HTMLElement>('footer.footer-wrap');
   const panelSources = Array.from(root.querySelectorAll<HTMLElement>(':scope > section'));
   if (panelSources.length < 2) return;
 
+  // Simpan state asli untuk restore saat destroy (navigasi Astro / cleanup).
+  const rootPrev = {
+    position: root.style.position,
+    top: root.style.top,
+    left: root.style.left,
+    right: root.style.right,
+    bottom: root.style.bottom,
+    overflow: root.style.overflow,
+    zIndex: root.style.zIndex,
+  };
+  const addedRootClasses = ['fixed', 'left-0', 'right-0', 'bottom-0', 'overflow-hidden', 'z-[1]', 'top-[var(--nav-h)]'];
+  const addedPanelClasses = [
+    'h-[calc(100dvh-var(--nav-h))]',
+    'max-h-[calc(100dvh-var(--nav-h))]',
+    'flex',
+    'flex-col',
+    'will-change-transform',
+    'overflow-y-auto',
+    'overflow-hidden',
+    'overflow-x-clip',
+    'overscroll-y-contain',
+  ];
+  const footerPrev = footer ? { parent: footer.parentNode, next: footer.nextSibling } : null;
+
   document.documentElement.classList.add('is-fullpage');
 
-  root.classList.add('fixed', 'left-0', 'right-0', 'bottom-0', 'overflow-hidden', 'z-[1]', 'top-[var(--nav-h)]');
+  root.classList.add(...addedRootClasses);
   root.dataset.fullpage = '';
   root.innerHTML = '';
 
@@ -53,7 +189,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
   let heroAnimated = false;
   let heroBusy = false;
   let heroTl: gsap.core.Timeline | undefined;
-  const heroIndex = panels.findIndex(p => p.id === 'hero' || p.dataset.hero === 'true');
+  const heroIndex = panels.findIndex((p) => p.id === 'hero' || p.dataset.hero === 'true');
   const heroPanel = heroIndex >= 0 ? panels[heroIndex] : undefined;
 
   if (heroPanel) {
@@ -130,10 +266,13 @@ export function initFullpage(root: HTMLElement): FullpageController {
   };
 
   // ── Input (Observer) ───────────────────────────────────────────────
-  // PENTING: tidak ada stopPropagation pada wheel. Event wheel vertikal di atas
-  // slider [data-drag-gallery] harus tetap "tembus" dan ditangkap Observer.
-  const allowObserver = (target: EventTarget | null) =>
+  // Beda gestur: vertikal murni => pindah section. Horizontal => diabaikan (slider).
+  // Jika gestur (touch/drag) dimulai di atas [data-drag-gallery], jangan picu pindah
+  // section (cegah rambatan vertikal tak sengaja) — slider meng-handle horizontal.
+  const allowTarget = (target: EventTarget | null) =>
     !(target as HTMLElement | null)?.closest('input, textarea, select, [contenteditable="true"]');
+  const overGallery = (target: EventTarget | null) =>
+    !!(target as HTMLElement | null)?.closest('[data-drag-gallery]');
 
   const atEdgeForIntent = (el: HTMLElement, intentNext: boolean) => {
     const max = el.scrollHeight - el.clientHeight;
@@ -147,8 +286,12 @@ export function initFullpage(root: HTMLElement): FullpageController {
 
   const isHero = () => heroIndex >= 0 && current === heroIndex;
 
-  const handleDownIntent = (target: EventTarget | null) => { // intent ke BAWAH => next
-    if (!allowObserver(target) || animating || heroBusy) return;
+  type IntentSelf = { axis?: string | null; event?: Event | null };
+
+  const handleDownIntent = (target: EventTarget | null, self?: IntentSelf) => {
+    if (!allowTarget(target) || animating || heroBusy) return;
+    if (self?.axis === 'x') return; // swipe horizontal => bukan navigasi section
+    if (overGallery(target) && self?.event instanceof TouchEvent) return; // cegah rambatan vertikal di atas slider
     if (shouldConsumeInternally(target, true)) return;
     if (isHero()) {
       if (!heroAnimated) { playHero(); return; }
@@ -158,8 +301,10 @@ export function initFullpage(root: HTMLElement): FullpageController {
     goto(current + 1);
   };
 
-  const handleUpIntent = (target: EventTarget | null) => { // intent ke ATAS => prev
-    if (!allowObserver(target) || animating || heroBusy) return;
+  const handleUpIntent = (target: EventTarget | null, self?: IntentSelf) => {
+    if (!allowTarget(target) || animating || heroBusy) return;
+    if (self?.axis === 'x') return; // swipe horizontal => bukan navigasi section
+    if (overGallery(target) && self?.event instanceof TouchEvent) return; // cegah rambatan vertikal di atas slider
     if (shouldConsumeInternally(target, false)) return;
     if (isHero()) {
       if (heroAnimated) { reverseHero(false); return; }
@@ -168,16 +313,19 @@ export function initFullpage(root: HTMLElement): FullpageController {
     goto(current - 1);
   };
 
-  // preventDefault:true mengunci scroll strict; wheel di atas slider tetap diproses (no stopPropagation).
+  // preventDefault:true => strict (tanpa scroll bawaan). lockAxis membedakan swipe vertikal/horizontal.
   const observer = Observer.create({
     target: window,
-    type: 'wheel,touch',
+    type: 'wheel,touch,pointer',
     preventDefault: true,
+    lockAxis: true,
     wheelSpeed: -1,
     tolerance: 14,
     dragMinimum: 10,
-    onUp: (self) => handleDownIntent(self.event?.target),   // scroll/swipe down => next
-    onDown: (self) => handleUpIntent(self.event?.target),   // scroll/swipe up   => prev
+    onUp: (self) => handleDownIntent(self.event?.target, self),
+    onDown: (self) => handleUpIntent(self.event?.target, self),
+    onLeft: () => {},
+    onRight: () => {},
   });
 
   const onKey = (e: KeyboardEvent) => {
@@ -191,7 +339,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
   const indexForHash = (hash: string) => {
     const id = hash.replace(/^#\/?/, '');
     if (!id || id === 'top' || id === 'hero') return heroIndex >= 0 ? heroIndex : 0;
-    const idx = panels.findIndex(p => p.id === id || p.querySelector(`#${CSS.escape(id)}`));
+    const idx = panels.findIndex((p) => p.id === id || p.querySelector(`#${CSS.escape(id)}`));
     return idx < 0 ? 0 : idx;
   };
 
@@ -227,6 +375,33 @@ export function initFullpage(root: HTMLElement): FullpageController {
       window.removeEventListener('keydown', onKey);
       document.removeEventListener('click', onClick);
       window.removeEventListener('resize', onResize);
+
+      // Pulihkan DOM ke struktur asli (aman untuk Astro transitions).
+      try {
+        panelSources.forEach((el) => {
+          delete el.dataset.fullpageSection;
+          el.classList.remove(...addedPanelClasses);
+          el.style.minHeight = '';
+          root.appendChild(el);
+        });
+        if (footer && footerPrev) {
+          if (footerPrev.parent) {
+            if (footerPrev.next) footerPrev.parent.insertBefore(footer, footerPrev.next);
+            else footerPrev.parent.appendChild(footer);
+          }
+        }
+      } catch { /* best-effort restore */ }
+
+      if (track.parentNode === root) root.removeChild(track);
+      delete root.dataset.fullpage;
+      root.classList.remove(...addedRootClasses);
+      root.style.position = rootPrev.position;
+      root.style.top = rootPrev.top;
+      root.style.left = rootPrev.left;
+      root.style.right = rootPrev.right;
+      root.style.bottom = rootPrev.bottom;
+      root.style.overflow = rootPrev.overflow;
+      root.style.zIndex = rootPrev.zIndex;
       document.documentElement.classList.remove('is-fullpage');
     },
   };
