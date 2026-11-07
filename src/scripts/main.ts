@@ -2,14 +2,12 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import SplitType from 'split-type';
+import { initFullpage } from './fullpage';
 
 gsap.registerPlugin(ScrollTrigger);
 
 document.documentElement.classList.add('js-ready');
 document.documentElement.dataset.motionReady = 'true';
-
-// Navbar height must match CSS (.site-header height)
-const NAV_H = () => (window.innerWidth <= 640 ? 72 : 88);
 
 let cleanup: (() => void) | undefined;
 
@@ -149,20 +147,36 @@ const init = () => {
         else { rafActive = false; gsap.ticker.remove(tick); snapToNearest(); }
       };
 
-      // Pointer drag handlers
+      // Pointer drag handlers (axis-locked: vertikal -> lepas agar native scroll section, horizontal -> drag slider)
+      let startX = 0, startY = 0, axis: 'x' | 'y' | null = null;
       const pointerDown = (e: PointerEvent) => {
         if (e.pointerType === 'mouse' && e.button !== 0) return;
-        if ((e.target as HTMLElement | null)?.closest('[data-gallery-prev],[data-gallery-next]')) return;
-        pointerId = e.pointerId; dragging = true; stepping = false; dragDistance = 0;
+        if ((e.target as HTMLElement | null)?.closest('[data-gallery-prev],[data-gallery-next],[data-gallery-nav]')) return;
+        pointerId = e.pointerId; dragging = true; stepping = false; dragDistance = 0; axis = null;
+        startX = e.clientX; startY = e.clientY;
         settleTween?.kill(); rafActive = false; gsap.ticker.remove(tick);
         gallery.setPointerCapture(e.pointerId);
         lastX = e.clientX; lastTime = performance.now(); velocity = 0;
         galleryCards.forEach(c => gsap.killTweensOf(c));
         gsap.killTweensOf(galleryTrack);
-        gallery.classList.add('is-dragging');
       };
       const pointerMove = (e: PointerEvent) => {
         if (!dragging || e.pointerId !== pointerId) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (!axis) {
+          if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+          axis = Math.abs(dy) > Math.abs(dx) ? 'y' : 'x'; // isolasi: vertikal dominan => jangan geser slider
+          if (axis === 'y') {
+            dragging = false; pointerId = null; axis = null;
+            try { gallery.releasePointerCapture(e.pointerId); } catch {}
+            gallery.classList.remove('is-dragging');
+            return; // biarkan native vertical scroll (section #work) bekerja normal
+          }
+          gallery.classList.add('is-dragging');
+        }
+        if (axis !== 'x') return;
+        if (e.cancelable) e.preventDefault();
         const now = performance.now();
         const delta = e.clientX - lastX;
         dragDistance += Math.abs(delta);
@@ -172,11 +186,12 @@ const init = () => {
         lastX = e.clientX; lastTime = now;
       };
       const pointerUp = (e: PointerEvent) => {
-        if (!dragging || e.pointerId !== pointerId) return;
-        dragging = false; pointerId = null;
-        gallery.releasePointerCapture(e.pointerId);
+        if (e.pointerId !== pointerId) return;
+        const wasDragging = dragging && axis === 'x';
+        dragging = false; pointerId = null; axis = null;
+        try { gallery.releasePointerCapture(e.pointerId); } catch {}
         gallery.classList.remove('is-dragging');
-        rafActive = true; gsap.ticker.add(tick);
+        if (wasDragging) { rafActive = true; gsap.ticker.add(tick); }
       };
       const onClickCapture = (e: MouseEvent) => { if (dragDistance > 6) { e.preventDefault(); e.stopPropagation(); } };
       const onKeydown = (e: KeyboardEvent) => {
@@ -220,62 +235,57 @@ const init = () => {
       };
     }
 
+    // ── Cursor glow ───────────────────────────────────────────────────
+    let cursorCleanup: (() => void) | undefined;
+    if (window.matchMedia('(pointer:fine)').matches) {
+      const glow = document.querySelector<HTMLElement>('[data-cursor-glow]');
+      const move = (e: PointerEvent) => { if (glow) gsap.to(glow, { x: e.clientX, y: e.clientY, opacity: 1, duration: 0.65, ease: 'power2.out', overwrite: true }); };
+      window.addEventListener('pointermove', move, { passive: true });
+      document.querySelectorAll<HTMLElement>('.magnetic').forEach(el => {
+        const enter = (e: PointerEvent) => { const b = el.getBoundingClientRect(); gsap.to(el, { x: (e.clientX - b.left - b.width / 2) * 0.12, y: (e.clientY - b.top - b.height / 2) * 0.18, duration: 0.35 }); };
+        const leave = () => gsap.to(el, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1,.45)' });
+        el.addEventListener('pointermove', enter);
+        el.addEventListener('pointerleave', leave);
+      });
+      cursorCleanup = () => window.removeEventListener('pointermove', move);
+    }
+
     // ── Reduced motion ────────────────────────────────────────────────
     if (reduceMotion) {
       document.querySelectorAll<HTMLElement>('.project-card, .reveal-up, [data-reveal-text]').forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
-      cleanup = () => { menuCleanup(); galleryCleanup?.(); ctx.revert(); };
+      cleanup = () => { menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); ctx.revert(); };
       return;
     }
 
-    // ── Lenis smooth scroll ───────────────────────────────────────────
-    const lenis = new Lenis({ duration: 0.86, smoothWheel: true, wheelMultiplier: 0.82 });
-    lenis.on('scroll', ScrollTrigger.update);
-    const raf = (t: number) => lenis.raf(t * 1000);
-    gsap.ticker.add(raf);
-    gsap.delayedCall(0.15, () => ScrollTrigger.refresh());
-
-    // ── Page-level snap scroll ────────────────────────────────────────
-    // ScrollTrigger owns the snap lifecycle so it waits for Lenis inertia
-    // to settle and does not compete with a second ticker-based snapper.
-    const snapRoot = document.querySelector<HTMLElement>('main[data-snap-scroll]');
-    const snapSections = snapRoot
-      ? Array.from(snapRoot.querySelectorAll<HTMLElement>(':scope > section'))
-      : [];
-    let snapTrigger: ScrollTrigger | undefined;
-
-    if (snapSections.length > 1) {
-      const getSnapPoints = () => {
-        const maxScroll = ScrollTrigger.maxScroll(window);
-        if (maxScroll <= 0) return [0];
-
-        return snapSections.map(section => (
-          Math.max(0, Math.min(maxScroll, section.offsetTop - NAV_H())) / maxScroll
-        ));
-      };
-
-      snapTrigger = ScrollTrigger.create({
-        trigger: snapRoot,
-        start: 0,
-        end: 'max',
-        invalidateOnRefresh: true,
-        snap: {
-          snapTo: value => gsap.utils.snap(getSnapPoints(), value),
-          delay: 0.06,
-          duration: { min: 0.38, max: 0.95 },
-          ease: 'power4.out',
-          inertia: false,
-          directional: true,
-        },
-      });
-    }
-
-    // ── Scroll reveal ─────────────────────────────────────────────────
+    // ── Split hero title (runs on load) ───────────────────────────────
     const splitInstances: SplitType[] = [];
     document.querySelectorAll<HTMLElement>('[data-split]').forEach(el => {
       const split = new SplitType(el, { types: 'chars', tagName: 'span' });
       splitInstances.push(split);
       gsap.from(split.chars, { yPercent: 115, opacity: 0, rotateX: -45, stagger: 0.025, duration: 1.05, ease: 'power4.out', delay: 0.25 });
     });
+
+    // ── Homepage fullpage (GSAP Observer, strict: no overflow) ────────
+    const fullpageRoot = document.querySelector<HTMLElement>('main[data-fullpage], main[data-snap-scroll]');
+    if (fullpageRoot) {
+      const fullpage = initFullpage(fullpageRoot);
+      cleanup = () => {
+        menuCleanup(); galleryCleanup?.(); cursorCleanup?.();
+        fullpage?.destroy();
+        ctx.revert();
+        splitInstances.forEach(s => s.revert());
+      };
+      return;
+    }
+
+    // ── Non-homepage / fallback: Lenis + ScrollTrigger reveals ────────
+    document.documentElement.classList.remove('is-fullpage');
+    const lenis = new Lenis({ duration: 0.86, smoothWheel: true, wheelMultiplier: 0.82 });
+    lenis.on('scroll', ScrollTrigger.update);
+    const raf = (t: number) => lenis.raf(t * 1000);
+    gsap.ticker.add(raf);
+    gsap.delayedCall(0.15, () => ScrollTrigger.refresh());
+
     gsap.utils.toArray<HTMLElement>('.reveal-up, [data-reveal-text]').forEach(el => {
       gsap.to(el, { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
     });
@@ -288,21 +298,7 @@ const init = () => {
       });
     }
 
-    // ── Cursor glow ───────────────────────────────────────────────────
-    if (window.matchMedia('(pointer:fine)').matches) {
-      const glow = document.querySelector<HTMLElement>('[data-cursor-glow]');
-      const move = (e: PointerEvent) => { if (glow) gsap.to(glow, { x: e.clientX, y: e.clientY, opacity: 1, duration: 0.65, ease: 'power2.out', overwrite: true }); };
-      window.addEventListener('pointermove', move, { passive: true });
-      document.querySelectorAll<HTMLElement>('.magnetic').forEach(el => {
-        const enter = (e: PointerEvent) => { const b = el.getBoundingClientRect(); gsap.to(el, { x: (e.clientX - b.left - b.width / 2) * 0.12, y: (e.clientY - b.top - b.height / 2) * 0.18, duration: 0.35 }); };
-        const leave = () => gsap.to(el, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1,.45)' });
-        el.addEventListener('pointermove', enter);
-        el.addEventListener('pointerleave', leave);
-      });
-      cleanup = () => { menuCleanup(); galleryCleanup?.(); snapTrigger?.kill(); window.removeEventListener('pointermove', move); ctx.revert(); splitInstances.forEach(s => s.revert()); lenis.destroy(); gsap.ticker.remove(raf); };
-    } else {
-      cleanup = () => { menuCleanup(); galleryCleanup?.(); snapTrigger?.kill(); ctx.revert(); splitInstances.forEach(s => s.revert()); lenis.destroy(); gsap.ticker.remove(raf); };
-    }
+    cleanup = () => { menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); ctx.revert(); splitInstances.forEach(s => s.revert()); lenis.destroy(); gsap.ticker.remove(raf); };
   });
 };
 

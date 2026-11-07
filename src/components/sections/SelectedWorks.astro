@@ -2,18 +2,26 @@
 import { galleryProjects } from '../../data/project-gallery';
 import ProjectCard from './ProjectCard.astro';
 ---
-<section class="work-section section-pad" id="work" aria-labelledby="work-title">
-  <div class="work-intro">
-    <h2 id="work-title">Projects</h2>
-    <p>Selected projects</p>
+<!-- strict layout: overflow-hidden; wheel vertikal di atas slider tetap tembus ke GSAP Observer (no stopPropagation) -->
+<section
+  class="work-section section-pad relative h-[calc(100dvh-var(--nav-h))] max-h-[calc(100dvh-var(--nav-h))] min-h-0 flex flex-col overflow-hidden [will-change:transform]"
+  id="work"
+  aria-labelledby="work-title"
+>
+  <!-- Judul absolute center + inverter (mix-blend), di luar flow; pointer-events-none agar drag slider tidak terganggu -->
+  <div class="pointer-events-none absolute top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 text-center mix-blend-difference text-white">
+    <h2 id="work-title" class="m-0 mt-2 font-[var(--display)] text-[clamp(56px,11vw,180px)] font-semibold leading-[0.82] tracking-[-0.07em]">Projects</h2>
   </div>
-  <div class="works-stage" data-drag-gallery role="region" aria-roledescription="carousel" aria-label="Selected projects" tabindex="0">
-    <div class="works-stage-top"><span>02 — SELECTED PROJECTS</span><span data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span></div>
+
+  <!-- Slider: flex-1 + items-center => presisi di tengah vertikal (judul sudah absolute) -->
+  <div class="works-stage relative flex min-h-0 w-full flex-1 items-center" data-drag-gallery role="region" aria-roledescription="carousel" aria-label="Selected projects" tabindex="0">
+    <div class="works-stage-top"><span>DRAG HORIZONTAL</span><span data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span></div>
     <div class="project-list" data-gallery-track>
       {galleryProjects.map((project, index) => <ProjectCard project={project} index={index} />)}
     </div>
     <button class="works-nav works-nav-prev" type="button" data-gallery-prev aria-label="Previous project">←</button>
     <button class="works-nav works-nav-next" type="button" data-gallery-next aria-label="Next project">→</button>
   </div>
-  <div class="work-foot"><span>2023 — 2026</span><a href="https://github.com/bayumutawakkil" target="_blank" rel="noreferrer">VIEW ALL PROJECTS <span>↗</span></a></div>
+
+  <div class="work-foot z-[6] shrink-0 pt-[clamp(8px,1.4vh,16px)]"><span>2023 — 2026</span><a href="https://github.com/bayumutawakkil" target="_blank" rel="noreferrer">VIEW ALL PROJECTS <span>↗</span></a></div>
 </section>

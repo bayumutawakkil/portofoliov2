@@ -2,20 +2,22 @@
 import { experience } from '../../data/site';
 import SectionHeading from '../ui/SectionHeading.astro';
 ---
-<section class="experience section-pad" id="experience" aria-labelledby="experience-title">
-  <SectionHeading number="04 — EXPERIENCE" aside="LEARNING IN PUBLIC" />
-  <div class="experience-heading">
+<section class="experience section-pad h-[calc(100dvh-var(--nav-h))] max-h-[calc(100dvh-var(--nav-h))] overflow-hidden flex flex-col min-h-0" id="experience" aria-labelledby="experience-title">
+  <div class="shrink-0">
+    <SectionHeading number="04 — EXPERIENCE" aside="LEARNING IN PUBLIC" />
+  </div>
+  <div class="experience-heading shrink-0">
     <h2 id="experience-title">Learning through<br /><span>real systems.</span></h2>
   </div>
-  <ol class="experience-list">
+  <ol class="experience-list min-h-0 flex-1">
     {experience.map((item) => (
-      <li class="experience-row">
+      <li class="experience-row min-h-0">
         <span class="experience-period">{item.period}</span>
-        <div>
+        <div class="min-h-0">
           <h3>{item.title}</h3>
           <p>{item.organization}</p>
         </div>
-        <p>{item.detail}</p>
+        <p class="min-h-0">{item.detail}</p>
       </li>
     ))}
   </ol>
