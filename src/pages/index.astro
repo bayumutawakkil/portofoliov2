@@ -23,10 +23,10 @@ import { profile, capabilities } from '../data/site';
           <span class="sr-only" id="hero-title">Bayu Mutawakkil</span>
 
           <!-- Container magazine layout mobile: BAYU -> Foto menimpa (overlap) -> MUTAWAKKIL di belakang bawah foto -->
-          <div class="relative flex w-full flex-col items-center justify-center max-lg:isolate lg:contents">
+          <div class="relative max-lg:flex max-lg:flex-col max-lg:justify-center max-lg:items-center max-lg:isolate lg:contents">
             <!-- BAYU: Sangat besar, tebal, leading-none, text-center di mobile -->
-            <div class="relative z-[1] shrink-0 text-center lg:pointer-events-none lg:absolute lg:inset-x-0 lg:top-1/2 lg:order-none lg:-translate-y-[72%] lg:text-left">
-              <span aria-hidden="true" class="hero-title m-0 block px-2 font-[var(--display)] font-bold tracking-[-0.06em] text-[clamp(4.2rem,19vw,7.5rem)] leading-[0.8] text-center [text-shadow:0_10px_40px_rgba(0,0,0,0.45)] max-lg:will-change-[transform,opacity] lg:px-[clamp(8px,2vw,24px)] lg:text-[clamp(4rem,18vw,7rem)] lg:leading-[0.88] lg:self-start lg:text-left">
+            <div class="relative z-[1] shrink-0 text-center lg:pointer-events-none lg:absolute lg:inset-x-0 lg:top-1/2 lg:order-none lg:-translate-y-[72%] lg:text-left lg:ml-[10vw] max-lg:-mb-6">
+              <span aria-hidden="true" class="hero-title m-0 block px-2 font-[var(--display)] font-bold tracking-[-0.06em] text-[clamp(5rem,20vw,8rem)] leading-none text-center [text-shadow:0_10px_40px_rgba(0,0,0,0.45)] max-lg:will-change-[transform,opacity] lg:px-[clamp(8px,2vw,24px)] lg:text-[clamp(4rem,20vw,8rem)] lg:leading-none lg:self-start lg:text-left">
                 <span data-hero-bayu class="inline-block max-lg:!transform-none max-lg:!opacity-100 will-change-transform">BAYU</span>
               </span>
             </div>
@@ -35,15 +35,15 @@ import { profile, capabilities } from '../data/site';
             <div
               data-hero-photo
               aria-hidden="true"
-              class="relative z-[3] flex w-[85vw] max-w-xs sm:max-w-sm shrink items-center justify-center -mt-7 sm:-mt-10 -mb-8 sm:-mb-12 max-lg:will-change-[transform,opacity] max-lg:!opacity-100 max-lg:!transform-none lg:pointer-events-none lg:absolute lg:inset-x-0 lg:bottom-0 lg:m-0 lg:h-full lg:w-auto lg:max-w-none lg:items-end lg:pb-[clamp(10px,2vh,24px)] lg:opacity-0"
+              class="relative z-[3] flex left-1/2 -translate-x-1/2 w-full max-w-[24rem] shrink items-center justify-center -mt-7 sm:-mt-10 -mb-8 sm:-mb-12 max-w-full max-lg:max-w-[24rem] lg:pointer-events-none lg:absolute lg:bottom-0 lg:m-0 lg:h-full lg:w-auto lg:items-end lg:pb-[clamp(10px,2vh,24px)] lg:opacity-0"
             >
               <div class="relative flex items-center justify-center">
                 <!-- Soft glow di belakang foto untuk menambah depth majalah -->
-                <div class="pointer-events-none absolute inset-0 -z-10 scale-95 rounded-full bg-gradient-to-t from-[#4d9fff]/20 to-[#82d8ed]/10 blur-2xl max-lg:block lg:hidden"></div>
+                <div class="pointer-events-none absolute inset-0 -z-10 scale-95 rounded-full bg-gradient-to-br from-[#4d9fff]/15 via-transparent to-transparent blur-2xl max-lg:block lg:hidden"></div>
                 <img
                   src="/bayu.png"
                   alt=""
-                  class="h-auto w-full max-h-[46vh] select-none rounded-2xl object-contain object-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.85)] filter contrast-[1.03] lg:h-[min(68%,600px)] lg:max-h-none lg:max-w-[min(86vw,480px)]"
+                  class="h-auto w-full max-h-[46vh] select-none rounded-2xl object-contain object-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.85)] filter contrast-[1.03] lg:h-[min(68%,600px)] lg:max-h-none lg:max-w-[24rem]"
                   loading="eager"
                   decoding="async"
                 />
@@ -51,8 +51,8 @@ import { profile, capabilities } from '../data/site';
             </div>
 
             <!-- MUTAWAKKIL: Di belakang bagian bawah foto dengan z-[1] -->
-            <div class="relative z-[1] shrink-0 text-center lg:pointer-events-none lg:absolute lg:inset-x-0 lg:top-1/2 lg:order-none lg:translate-y-[-2%] lg:text-right">
-              <span aria-hidden="true" class="hero-title m-0 block px-2 font-[var(--display)] font-bold tracking-[-0.06em] text-[clamp(2.9rem,13.5vw,5.5rem)] leading-[0.8] text-center [text-shadow:0_10px_40px_rgba(0,0,0,0.45)] max-lg:will-change-[transform,opacity] lg:px-[clamp(8px,2vw,24px)] lg:text-[clamp(4rem,18vw,7rem)] lg:leading-[0.88] lg:self-end lg:text-right">
+            <div class="relative z-[1] shrink-0 text-center lg:pointer-events-none lg:absolute lg:inset-x-0 lg:top-1/2 lg:order-none lg:translate-y-[-2%] lg:text-right lg:mr-[18vw] max-lg:-mt-6">
+              <span aria-hidden="true" class="hero-title m-0 block px-2 font-[var(--display)] font-bold tracking-[-0.06em] text-[clamp(5rem,20vw,8rem)] leading-none text-center [text-shadow:0_10px_40px_rgba(0,0,0,0.45)] max-lg:will-change-[transform,opacity] lg:px-[clamp(8px,2vw,24px)] lg:text-[clamp(4rem,20vw,8rem)] lg:leading-none lg:self-end lg:text-right">
                 <span data-hero-mutawakkil class="inline-block max-lg:!transform-none max-lg:!opacity-100 will-change-transform">MUTAWAKKIL</span>
               </span>
             </div>

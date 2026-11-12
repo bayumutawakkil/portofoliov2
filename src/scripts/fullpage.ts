@@ -38,7 +38,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
       el.style.willChange = 'transform, opacity';
       gsap.fromTo(
         el,
-        { y: 40, opacity: 0 },
+        { y: 40, opacity: 0, immediateRender: false },
         {
           y: 0,
           opacity: 1,
@@ -51,6 +51,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
           },
         }
       );
+      gsap.set(el, { y: 0, opacity: 1 });
     });
 
     // 2. Project Slider
@@ -59,7 +60,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
       workStage.style.willChange = 'transform, opacity';
       gsap.fromTo(
         workStage,
-        { y: 40, opacity: 0 },
+        { y: 40, opacity: 0, immediateRender: false },
         {
           y: 0,
           opacity: 1,
@@ -72,6 +73,18 @@ export function initFullpage(root: HTMLElement): FullpageController {
           },
         }
       );
+      gsap.set(workStage, { y: 0, opacity: 1 });
+
+      // Kartu slider ikut fade-in bersama stage saat section #work masuk viewport.
+      document.querySelectorAll<HTMLElement>('#work .project-list [data-gallery-card]').forEach((card) => {
+        card.style.willChange = 'transform, opacity';
+        gsap.fromTo(
+          card,
+          { y: 40, opacity: 0, immediateRender: false },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: workStage, start: 'top 85%', once: true } }
+        );
+        gsap.set(card, { y: 0, opacity: 1 });
+      });
     }
 
     // 3. Bento Grid Cards (#expertise) dengan stagger: 0.15
@@ -80,7 +93,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
       bentoCards.forEach((c) => { c.style.willChange = 'transform, opacity'; });
       gsap.fromTo(
         bentoCards,
-        { y: 40, opacity: 0 },
+        { y: 40, opacity: 0, immediateRender: false },
         {
           y: 0,
           opacity: 1,
@@ -94,6 +107,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
           },
         }
       );
+      bentoCards.forEach((c) => gsap.set(c, { y: 0, opacity: 1 }));
     }
 
     // 4. Experience Rows (#experience) dengan stagger: 0.15
@@ -102,7 +116,7 @@ export function initFullpage(root: HTMLElement): FullpageController {
       expRows.forEach((r) => { r.style.willChange = 'transform, opacity'; });
       gsap.fromTo(
         expRows,
-        { y: 40, opacity: 0 },
+        { y: 40, opacity: 0, immediateRender: false },
         {
           y: 0,
           opacity: 1,
@@ -116,7 +130,12 @@ export function initFullpage(root: HTMLElement): FullpageController {
           },
         }
       );
+      expRows.forEach((r) => gsap.set(r, { y: 0, opacity: 1 }));
     }
+
+    // Pastikan ScrollTrigger ter-registrasi & di-refresh setelah animasi dibuat
+    // (mencegah entrance animation stuck di dari-state sehingga konten terlihat disembunyikan).
+    ScrollTrigger.refresh();
   });
 
   return {
