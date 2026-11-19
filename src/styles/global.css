@@ -592,3 +592,19 @@ html.is-fullpage #work .work-foot { margin-top: clamp(8px, 1.4vh, 18px); }
 .project-card:hover .visual-open b { color: var(--sun); }
 .text-link span, .inline-link span { color: var(--sun); }
 :where(a, button, [tabindex]):focus-visible { outline-color: var(--sun); }
+
+/* ── Active nav indicator ── */
+.desktop-nav a[aria-current="true"] { color: #fff; }
+.desktop-nav a[aria-current="true"]::after {
+  content: ""; display: block; height: 2px; margin-top: 4px; background: var(--sun); border-radius: 2px;
+}
+.mobile-menu a[aria-current="true"] { color: var(--sun); }
+
+/* ── Case study: next-project navigation ── */
+.detail-next { margin-top: clamp(48px, 8vh, 96px); border-top: 1px solid var(--line); }
+.detail-next a { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 28px 0; }
+.detail-next span { font: 10px var(--mono); letter-spacing: .16em; color: var(--muted); }
+.detail-next strong { display: block; margin-top: 8px; font: 600 clamp(2rem, 6vw, 4.5rem) / .95 var(--display); letter-spacing: -.05em; transition: color .3s ease; }
+.detail-next a:hover strong { color: var(--sun); }
+.detail-next svg { flex-shrink: 0; transition: transform .3s ease; }
+.detail-next a:hover svg { transform: translate(4px, -4px); }

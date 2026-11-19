@@ -9,10 +9,40 @@ gsap.registerPlugin(ScrollTrigger);
 document.documentElement.classList.add('js-ready');
 document.documentElement.dataset.motionReady = 'true';
 
+// ── Active section indicator for desktop/mobile nav ──────────────────
+let navCleanup: (() => void) | undefined;
+const initActiveNav = () => {
+  navCleanup?.();
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.desktop-nav a, .mobile-menu a'));
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  const map = new Map<string, HTMLAnchorElement[]>();
+  links.forEach(link => {
+    const id = link.getAttribute('href')?.split('#')[1];
+    if (!id) return;
+    map.set(id, [...(map.get(id) ?? []), link]);
+  });
+  const setActive = (id: string) => {
+    links.forEach(link => {
+      const linkId = link.getAttribute('href')?.split('#')[1];
+      if (linkId === id) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => { if (entry.isIntersecting) setActive(entry.target.id); });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  map.forEach((_, id) => {
+    const section = document.getElementById(id);
+    if (section) observer.observe(section);
+  });
+  navCleanup = () => { observer.disconnect(); links.forEach(l => l.removeAttribute('aria-current')); };
+};
+
 let cleanup: (() => void) | undefined;
 
 const init = () => {
   cleanup?.();
+  initActiveNav();
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ctx = gsap.context(() => {
 
@@ -305,4 +335,4 @@ const init = () => {
 };
 
 document.addEventListener('astro:page-load', init);
-document.addEventListener('astro:before-swap', () => cleanup?.(), { once: false });
+document.addEventListener('astro:before-swap', () => { cleanup?.(); navCleanup?.(); }, { once: false });
