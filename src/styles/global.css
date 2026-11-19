@@ -570,3 +570,25 @@ html.is-fullpage #work .work-foot { margin-top: clamp(8px, 1.4vh, 18px); }
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Palette: blue stays the base; four warm/bright accents add energy ──
+   sun = highlight & focus, coral = small emphasis, mint = live/available,
+   lilac = creative detail. Use sparingly: one accent per element. */
+:root {
+  --sun: #ffc857;
+  --coral: #ff7f6b;
+  --mint: #5ef2c2;
+  --lilac: #b59cff;
+}
+.section-number { color: var(--sun); }
+.eyebrow::before { background: var(--coral); }
+.project-blue .project-meta span:first-child,
+.project-blue .project-link { color: var(--electric, #4d9fff); }
+.project-cyan .project-meta span:first-child,
+.project-cyan .project-link { color: var(--mint); }
+.project-violet .project-meta span:first-child,
+.project-violet .project-link { color: var(--lilac); }
+.project-card:hover .project-title-row h3 { text-decoration-color: var(--sun); }
+.project-card:hover .visual-open b { color: var(--sun); }
+.text-link span, .inline-link span { color: var(--sun); }
+:where(a, button, [tabindex]):focus-visible { outline-color: var(--sun); }
