@@ -552,3 +552,21 @@ html.is-fullpage #work .work-foot { margin-top: clamp(8px, 1.4vh, 18px); }
   html.is-fullpage .experience-row { grid-template-columns: 1fr; gap: 4px; }
   html.is-fullpage .capability-list { grid-template-columns: 1fr; }
 }
+
+/* ── Accessibility pass: visible keyboard focus across all interactive elements ── */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+:where(.works-stage):focus-visible {
+  outline-offset: -2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
