@@ -1,6 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import type { CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
 import Nav from '../components/Nav.astro';
 
@@ -10,6 +10,9 @@ interface Props {
 
 const { project } = Astro.props;
 const { Content } = await project.render();
+const all = (await getCollection('projects')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const index = all.findIndex((p) => p.slug === project.slug);
+const next = all[(index + 1) % all.length];
 ---
 <BaseLayout title={`${project.data.title} — Bayu Mutawakkil`} description={project.data.summary}>
   <Nav />
@@ -28,5 +31,14 @@ const { Content } = await project.render();
       <div class="detail-prose"><Content /></div>
       <a class="button-primary" href={project.data.externalUrl} target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={16} aria-hidden="true" /></a>
     </article>
+    {next && next.slug !== project.slug && (
+      <nav class="detail-next" aria-label="Next project">
+        <a href={`/projects/${next.slug}`}>
+          <span>NEXT CASE STUDY</span>
+          <strong>{next.data.title}</strong>
+          <ArrowUpRight size={18} aria-hidden="true" />
+        </a>
+      </nav>
+    )}
   </main>
 </BaseLayout>

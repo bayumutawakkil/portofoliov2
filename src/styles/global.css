@@ -552,3 +552,169 @@ html.is-fullpage #work .work-foot { margin-top: clamp(8px, 1.4vh, 18px); }
   html.is-fullpage .experience-row { grid-template-columns: 1fr; gap: 4px; }
   html.is-fullpage .capability-list { grid-template-columns: 1fr; }
 }
+
+/* ── Accessibility pass: visible keyboard focus across all interactive elements ── */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+:where(.works-stage):focus-visible {
+  outline-offset: -2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Palette: blue stays the base; four warm/bright accents add energy ──
+   sun = highlight & focus, coral = small emphasis, mint = live/available,
+   lilac = creative detail. Use sparingly: one accent per element. */
+:root {
+  --sun: #ffc857;
+  --coral: #ff7f6b;
+  --mint: #5ef2c2;
+  --lilac: #b59cff;
+}
+.section-number { color: var(--sun); }
+.eyebrow::before { background: var(--coral); }
+.project-blue .project-meta span:first-child,
+.project-blue .project-link { color: var(--electric, #4d9fff); }
+.project-cyan .project-meta span:first-child,
+.project-cyan .project-link { color: var(--mint); }
+.project-violet .project-meta span:first-child,
+.project-violet .project-link { color: var(--lilac); }
+.project-card:hover .project-title-row h3 { text-decoration-color: var(--sun); }
+.project-card:hover .visual-open b { color: var(--sun); }
+.text-link span, .inline-link span { color: var(--sun); }
+:where(a, button, [tabindex]):focus-visible { outline-color: var(--sun); }
+
+/* ── Active nav indicator ── */
+.desktop-nav a[aria-current="true"] { color: #fff; }
+.desktop-nav a[aria-current="true"]::after {
+  content: ""; display: block; height: 2px; margin-top: 4px; background: var(--sun); border-radius: 2px;
+}
+.mobile-menu a[aria-current="true"] { color: var(--sun); }
+
+/* ── Case study: next-project navigation ── */
+.detail-next { margin-top: clamp(48px, 8vh, 96px); border-top: 1px solid var(--line); }
+.detail-next a { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 28px 0; }
+.detail-next span { font: 10px var(--mono); letter-spacing: .16em; color: var(--muted); }
+.detail-next strong { display: block; margin-top: 8px; font: 600 clamp(2rem, 6vw, 4.5rem) / .95 var(--display); letter-spacing: -.05em; transition: color .3s ease; }
+.detail-next a:hover strong { color: var(--sun); }
+.detail-next svg { flex-shrink: 0; transition: transform .3s ease; }
+.detail-next a:hover svg { transform: translate(4px, -4px); }
+
+/* ── Joy pass: playful accents layered on the existing navy identity ──
+   Structure, layout and GSAP behaviour are untouched; everything below is
+   additive. Tilt uses the standalone `rotate` property so it composes with
+   GSAP / Tailwind transforms instead of fighting them. */
+::selection { background: var(--sun); color: #07111f; }
+
+/* Hero doodles (decorative, desktop-first) */
+.hero-doodles { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.doodle { position: absolute; display: block; }
+.doodle-star { width: clamp(46px, 5.2vw, 84px); right: 8%; top: 9%; rotate: 12deg; filter: drop-shadow(0 6px 0 rgba(255, 127, 107, .55)); }
+.doodle-squig { width: clamp(70px, 8vw, 130px); left: 6%; bottom: 26%; rotate: -8deg; }
+.doodle-ring { width: clamp(34px, 3.6vw, 56px); aspect-ratio: 1; right: 24%; bottom: 20%; border: 4px solid var(--lilac); border-radius: 50%; }
+.doodle-dot { width: 16px; height: 16px; left: 30%; top: 12%; background: var(--mint); border-radius: 50%; }
+.doodle-note { font: 600 clamp(22px, 2.3vw, 34px)/1 'Caveat', cursive; color: var(--sun); left: 60%; top: 14%; rotate: -7deg; white-space: nowrap; }
+.doodle-note::after { content: ""; display: block; width: 62%; height: 3px; margin-top: 4px; background: var(--sun); border-radius: 3px; opacity: .8; }
+@media (max-width: 1023px) {
+  .doodle-squig, .doodle-ring, .doodle-note { display: none; }
+  .doodle-star { width: 40px; right: 6%; top: 3%; }
+  .doodle-dot { left: 8%; top: 6%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .doodle-star { animation: doodle-spin 14s linear infinite; }
+  .doodle-ring, .doodle-dot, .doodle-squig { animation: doodle-bob 5s ease-in-out infinite; }
+  .doodle-dot { animation-delay: -1.5s; } .doodle-squig { animation-delay: -3s; }
+  .status-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
+}
+@keyframes doodle-spin { to { rotate: 372deg; } }
+@keyframes doodle-bob { 50% { translate: 0 -10px; } }
+@keyframes pulse-dot { 50% { box-shadow: 0 0 0 7px rgba(90, 214, 160, 0); } }
+
+/* Type: warmer emphasis, better contrast on dimmed words */
+.hero-intro strong { background: linear-gradient(transparent 62%, rgba(255, 200, 87, .38) 62%); padding: 0 .12em; }
+.manifesto-title span {
+  color: #a9bfd4;
+  text-decoration: underline wavy var(--sun) 2px;
+  text-underline-offset: .14em;
+  text-decoration-skip-ink: none;
+}
+.principles-title h2 span { color: var(--lilac); }
+.contact-content h2 span { color: var(--sun); }
+.contact-content h2 span::after { content: " ✺"; color: var(--coral); font-size: .5em; vertical-align: .55em; display: inline-block; }
+@media (prefers-reduced-motion: no-preference) {
+  .contact-content h2 span::after { animation: doodle-spin 10s linear infinite; }
+}
+
+/* Brand + buttons */
+.brand-mark { display: inline-block; transition: rotate .35s cubic-bezier(.3, 1.8, .5, 1); }
+.brand:hover .brand-mark { rotate: -8deg; }
+.brand:hover .brand-mark span { color: var(--sun); }
+.button-primary {
+  background: var(--sun); box-shadow: 4px 4px 0 var(--coral);
+  transition: background .25s, transform .2s, box-shadow .2s;
+}
+.button-primary:hover { background: #ffd982; box-shadow: 7px 7px 0 var(--coral); translate: -2px -2px; }
+.button-primary:active { box-shadow: 1px 1px 0 var(--coral); translate: 3px 3px; }
+.button-primary .button-arrow { display: inline-block; transition: transform .25s; }
+.button-primary:hover .button-arrow { transform: rotate(45deg); }
+.hero-bottom .text-link:hover span { display: inline-block; transform: translateY(3px); transition: transform .2s; }
+
+/* Project cards: each takes its accent colour as a hard offset shadow + tilt */
+#work .project-card { transition: box-shadow .35s ease, border-color .35s ease, rotate .4s cubic-bezier(.3, 1.6, .5, 1); }
+#work .project-blue { --acc: #4d9fff; } #work .project-cyan { --acc: var(--mint); } #work .project-violet { --acc: var(--lilac); }
+#work .project-card:hover, #work .project-card:focus-within {
+  border-color: var(--acc, #82d8ed);
+  box-shadow: 7px 8px 0 var(--acc, #82d8ed), 0 24px 50px -6px rgba(0, 0, 0, .8);
+  rotate: -1.2deg;
+}
+#work .project-card:nth-child(even):hover, #work .project-card:nth-child(even):focus-within { rotate: 1.2deg; }
+#work .visual-top span:last-child { background: var(--sun); color: #07111f; padding: 2px 8px; border-radius: 99px; font-weight: 600; rotate: 4deg; }
+#work .visual-open { background: var(--sun); color: #07111f; border: 0; padding: 6px 12px; border-radius: 99px; bottom: 16px; left: 16px; font-weight: 600; }
+#work .visual-open b { color: #07111f !important; }
+#work .visual-watermark { color: rgba(255, 200, 87, .22); }
+#work .project-card:hover .project-title-row h3 { color: var(--acc, #aee6f5); }
+.works-nav:hover { border-color: var(--sun); box-shadow: 0 6px 24px rgba(0, 0, 0, .5), 4px 4px 0 var(--sun); }
+
+/* Capability cards: cycling accents */
+.cap-card:nth-child(1) { --acc: var(--sun); } .cap-card:nth-child(2) { --acc: var(--coral); }
+.cap-card:nth-child(3) { --acc: var(--mint); } .cap-card:nth-child(4) { --acc: var(--lilac); }
+.cap-id { color: var(--acc) !important; }
+.cap-card { transition: translate .3s, rotate .4s cubic-bezier(.3, 1.6, .5, 1), border-color .3s, box-shadow .3s !important; }
+.cap-card:hover { border-color: var(--acc) !important; rotate: -.7deg; box-shadow: 5px 6px 0 var(--acc) !important; }
+.cap-card:nth-child(even):hover { rotate: .7deg; }
+.cap-card:hover .cap-id { letter-spacing: .3em; }
+.cap-card h3 { transition: color .3s; }
+.cap-card:hover h3 { color: var(--acc); }
+
+/* Principles: numbers become coloured badges */
+.principle-list > div > span {
+  display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border-radius: 50%;
+  background: var(--b, var(--sun)); color: #07111f; font-weight: 600;
+  transition: rotate .35s cubic-bezier(.3, 1.8, .5, 1), scale .3s;
+}
+.principle-list > div:nth-child(1) { --b: var(--sun); } .principle-list > div:nth-child(2) { --b: var(--coral); } .principle-list > div:nth-child(3) { --b: var(--mint); }
+.principle-list > div:hover > span { rotate: 14deg; scale: 1.15; }
+.principle-list > div { transition: padding-left .3s, background .3s; }
+.principle-list > div:hover { padding-left: 10px; background: linear-gradient(90deg, rgba(255, 200, 87, .07), transparent); }
+
+/* Experience + contact */
+.experience-row { transition: padding-left .3s, background .3s; }
+.experience-row:hover { padding-left: 12px; background: linear-gradient(90deg, rgba(94, 242, 194, .06), transparent); }
+.experience-row:hover .experience-period { color: var(--mint); }
+.contact-cta { border-bottom-color: var(--sun); }
+.contact-cta b { color: var(--sun); display: inline-block; transition: transform .3s cubic-bezier(.3, 1.8, .5, 1); }
+.contact-cta:hover b { transform: rotate(45deg) scale(1.15); }
+.contact-links a { transition: color .2s, translate .2s; }
+.contact-links a:nth-child(1):hover { color: var(--sun); } .contact-links a:nth-child(2):hover { color: var(--coral); }
+.contact-links a:nth-child(3):hover { color: var(--lilac); } .contact-links a:nth-child(4):hover { color: var(--mint); }
+.contact-links a:hover { translate: 0 -3px; }
+.back-top:hover { color: var(--sun); }

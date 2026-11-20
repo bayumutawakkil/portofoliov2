@@ -21,6 +21,13 @@ import { profile, capabilities } from '../data/site';
              Desktop (lg): komposisi stepped absolute (BAYU kiri / MUTAWAKKIL kanan, foto naik dari bawah). -->
         <div class="hero-main relative flex min-h-0 flex-1 flex-col items-center justify-center py-6 max-lg:py-8 lg:block lg:py-0">
           <span class="sr-only" id="hero-title">Bayu Mutawakkil</span>
+          <div class="hero-doodles" aria-hidden="true">
+            <svg class="doodle doodle-star" viewBox="0 0 100 100"><path d="M50 4l10 28 30-6-20 22 22 20-30-4-12 28-12-28-30 4 22-20L10 26l30 6z" fill="#ffc857"/></svg>
+            <svg class="doodle doodle-squig" viewBox="0 0 120 30"><path d="M3 15q12-18 24 0t24 0 24 0 24 0 18 0" fill="none" stroke="#ff7f6b" stroke-width="5" stroke-linecap="round"/></svg>
+            <span class="doodle doodle-ring"></span>
+            <span class="doodle doodle-dot"></span>
+            <span class="doodle doodle-note">hello there!</span>
+          </div>
 
           <!-- Container magazine layout mobile: BAYU -> Foto menimpa (overlap) -> MUTAWAKKIL di belakang bawah foto -->
           <div class="relative max-lg:flex max-lg:flex-col max-lg:justify-center max-lg:items-center max-lg:isolate lg:contents">
@@ -63,7 +70,7 @@ import { profile, capabilities } from '../data/site';
           <p class="hero-intro reveal-up max-w-[46ch] max-lg:text-[12px] max-lg:leading-[1.55]">I’m <strong>Bayu Mutawakkil</strong> — an Information Systems student exploring the intersection of software engineering, business processes, and thoughtful digital experiences.</p>
           <div class="hero-actions reveal-up"><a class="button-primary magnetic" href="#work"><span>Explore projects</span><span class="button-arrow">↗</span></a><a class="text-link max-lg:hidden" href="#about">More about me <span>↓</span></a></div>
         </div>
-        <div class="hero-index relative z-[4] shrink-0 max-lg:text-[10px] max-lg:hidden" data-hero-meta><span>01 / 05</span><span class="hero-index-line"></span><span>SCROLL</span><span class="scroll-cue">↓</span></div>
+        <div class="hero-index relative z-[4] shrink-0 max-lg:text-[10px] max-lg:hidden" data-hero-meta><span>01 / 06</span><span class="hero-index-line"></span><span>SCROLL</span><span class="scroll-cue">↓</span></div>
       </section>
 
       <section class="manifesto section-pad flex h-auto min-h-[100svh] flex-col overflow-visible lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden" id="about">
@@ -96,7 +103,7 @@ import { profile, capabilities } from '../data/site';
             {capabilities.map((item, i) => (
               <article
                 class:list={[
-                  'group relative flex h-auto flex-col justify-between overflow-visible rounded-2xl lg:h-full lg:min-h-0 lg:overflow-hidden lg:rounded-3xl',
+                  'cap-card group relative flex h-auto flex-col justify-between overflow-visible rounded-2xl lg:h-full lg:min-h-0 lg:overflow-hidden lg:rounded-3xl',
                   'border border-white/[0.08] bg-gradient-to-br from-white/[0.08] to-transparent',
                   'p-6 sm:p-7 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:p-[clamp(0.75rem,2.2vh,1.6rem)]',
                   'transition-all duration-300 ease-out',
@@ -108,7 +115,7 @@ import { profile, capabilities } from '../data/site';
                 <div class="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#4d9fff]/0 blur-2xl transition-all duration-300 group-hover:bg-[#4d9fff]/15"></div>
 
                 <div class="flex shrink-0 items-start justify-between gap-1">
-                  <span class="font-[var(--mono)] text-[10px] tracking-[0.14em] text-[#4d9fff] font-medium lg:text-[10px]">{item.id}</span>
+                  <span class="cap-id font-[var(--mono)] text-[10px] tracking-[0.14em] text-[#4d9fff] font-medium lg:text-[10px]">{item.id}</span>
                   <span class="text-white/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#82d8ed]">↗</span>
                 </div>
 
@@ -132,7 +139,7 @@ import { profile, capabilities } from '../data/site';
       </section>
 
       <section class="contact-section section-pad flex h-auto min-h-[100svh] flex-col overflow-visible lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden" id="contact">
-        <div class="section-heading shrink-0"><span class="section-number">05 — WHAT'S NEXT</span><span class="section-aside">LET'S MAKE SOMETHING MATTER</span></div>
+        <div class="section-heading shrink-0"><span class="section-number">06 — WHAT'S NEXT</span><span class="section-aside">LET'S MAKE SOMETHING MATTER</span></div>
         <div class="contact-content flex min-h-0 flex-1 flex-col justify-center lg:min-h-0"><span class="eyebrow"><i class="status-dot"></i> OPEN TO COLLABORATION & OPPORTUNITIES</span><h2>Have a problem<br/>worth <span>solving?</span></h2><p>I’m always interested in thoughtful conversations, meaningful projects, and opportunities to learn through building.</p><a class="contact-cta magnetic" href={`mailto:${profile.email}`}><span>Start a conversation</span><b>↗</b></a></div>
         <div class="contact-footer">
           <div class="footer-bottom"><span>© {new Date().getFullYear()} BAYU MUTAWAKKIL</span><span>DESIGN & ENGINEERING</span></div>
