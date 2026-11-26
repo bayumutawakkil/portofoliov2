@@ -1,10 +1,14 @@
 ---
+order: 1
 title: SIMAS UNAND
+shortTitle: SIMAS UNAND
 category: CAMPUS SYSTEM · FULL-STACK
+shortCategory: CAMPUS SYSTEM
 year: '2026'
 status: IN DEVELOPMENT
 accent: blue
 stack: [Python, Flask, MySQL, Next.js]
+# TODO(placeholder): Ganti dengan URL repositori spesifik SIMAS UNAND
 externalUrl: https://github.com/bayumutawakkil
 summary: Sistem informasi manajemen aktivitas dan presensi dengan validasi sesi, geofencing, unggah bukti, serta kontrol akses berbasis peran.
 ---

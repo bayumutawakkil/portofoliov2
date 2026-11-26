@@ -216,7 +216,7 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     const bayu = heroPanel.querySelector<HTMLElement>('[data-hero-bayu]');
     const muta = heroPanel.querySelector<HTMLElement>('[data-hero-mutawakkil]');
     const photo = heroPanel.querySelector<HTMLElement>('[data-hero-photo]');
-    const heroMeta = heroPanel.querySelectorAll<HTMLElement>('[data-hero-meta]');
+    const heroIndexEl = heroPanel.querySelectorAll<HTMLElement>('.hero-index');
 
     if (bayu && muta && photo) {
       gsap.set([bayu, muta], { xPercent: 0, autoAlpha: 1 });
@@ -241,7 +241,7 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
         .to(bayu, { xPercent: 55, autoAlpha: 0, duration: 0.7 }, 0)
         .to(muta, { xPercent: -55, autoAlpha: 0, duration: 0.7 }, 0.08)
         .to(photo, { yPercent: 0, autoAlpha: 1, duration: 0.95, ease: 'power4.out' }, 0.38)
-        .to(heroMeta, { autoAlpha: 0, y: -12, duration: 0.45, stagger: 0.03 }, 0);
+        .to(heroIndexEl, { autoAlpha: 0, y: -12, duration: 0.45 }, 0);
     }
   }
 

@@ -1,8 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
 import SplitType from 'split-type';
-import { initFullpage } from './fullpage';
 import type { LaptopController } from './laptop-3d';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -349,8 +347,13 @@ const init = () => {
     // GSAP Observer + overflow-hidden hanya di desktop.
     const fullpageRoot = document.querySelector<HTMLElement>('main[data-fullpage], main[data-snap-scroll]');
     if (fullpageRoot) {
-      const fullpage = initFullpage(fullpageRoot);
+      let fullpage: { destroy: () => void } | undefined;
+      let disposed = false;
+      import('./fullpage').then(({ initFullpage }) => {
+        if (!disposed) fullpage = initFullpage(fullpageRoot);
+      }).catch(() => {});
       cleanup = () => {
+        disposed = true;
         laptopDisposed = true;
         menuCleanup(); galleryCleanup?.(); cursorCleanup?.();
         laptopController?.destroy();
@@ -363,11 +366,18 @@ const init = () => {
 
     // ── Non-homepage: Lenis + ScrollTrigger reveals ───────────────────
     document.documentElement.classList.remove('is-fullpage');
-    const lenis = new Lenis({ duration: 0.86, smoothWheel: true, wheelMultiplier: 0.82 });
-    lenis.on('scroll', ScrollTrigger.update);
-    const raf = (t: number) => lenis.raf(t * 1000);
-    gsap.ticker.add(raf);
-    gsap.delayedCall(0.15, () => ScrollTrigger.refresh());
+    let lenisInstance: { destroy: () => void } | undefined;
+    let rafFn: ((t: number) => void) | undefined;
+    let disposed = false;
+    import('lenis').then(({ default: Lenis }) => {
+      if (disposed) return;
+      const lenis = new Lenis({ duration: 0.86, smoothWheel: true, wheelMultiplier: 0.82 });
+      lenis.on('scroll', ScrollTrigger.update);
+      rafFn = (t: number) => lenis.raf(t * 1000);
+      gsap.ticker.add(rafFn);
+      lenisInstance = lenis;
+      gsap.delayedCall(0.15, () => ScrollTrigger.refresh());
+    }).catch(() => {});
 
     gsap.utils.toArray<HTMLElement>('.reveal-up, [data-reveal-text]').forEach(el => {
       gsap.to(el, { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
@@ -381,7 +391,13 @@ const init = () => {
       });
     }
 
-    cleanup = () => { laptopDisposed = true; menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); laptopController?.destroy(); ctx.revert(); splitInstances.forEach(s => s.revert()); lenis.destroy(); gsap.ticker.remove(raf); };
+    cleanup = () => {
+      disposed = true;
+      laptopDisposed = true; menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); laptopController?.destroy();
+      ctx.revert(); splitInstances.forEach(s => s.revert());
+      lenisInstance?.destroy();
+      if (rafFn) gsap.ticker.remove(rafFn);
+    };
   });
 };
 

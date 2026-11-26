@@ -1,0 +1,83 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  category: string;
+  accent: 'blue' | 'cyan' | 'violet';
+}
+
+const { slug, title, category, accent } = Astro.props;
+---
+<div
+  class={`project-css-visual project-css-${accent}`}
+  role="img"
+  aria-label={`Visual abstrak untuk proyek ${title} (${category})`}
+>
+  <div class="css-visual-grid" aria-hidden="true"></div>
+
+  {slug === 'simas-unand' && (
+    <div class="css-visual-layer" aria-hidden="true">
+      <div class="simas-frame">
+        <div class="simas-rail">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="simas-body">
+          <div class="simas-bar-row"><i></i><i></i></div>
+          <div class="simas-blocks">
+            <div></div><div></div>
+          </div>
+          <div class="simas-wave">
+            <i style="height:38%"></i><i style="height:64%"></i><i style="height:52%"></i><i style="height:82%"></i><i style="height:70%"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {slug === 'mbg-sentiment-intelligence' && (
+    <div class="sentiment-visual" aria-hidden="true">
+      <div class="sentiment-orb orb-one"></div>
+      <div class="sentiment-orb orb-two"></div>
+      <div class="sentiment-orb orb-three"></div>
+      <div class="sentiment-center">
+        <span>NLP</span>
+        <strong>FLOW</strong>
+      </div>
+    </div>
+  )}
+
+  {slug === 'kastrat-digital' && (
+    <div class="network-visual" aria-hidden="true">
+      <div class="network-grid"></div>
+      <div class="network-lines"></div>
+      <span class="network-node node-a">A</span>
+      <span class="network-node node-b">B</span>
+      <span class="network-node node-c">C</span>
+      <span class="network-node node-d">D</span>
+    </div>
+  )}
+
+  {slug === 'simpatik' && (
+    <div class="css-visual-layer" aria-hidden="true">
+      <div class="simpatik-stack">
+        <div class="simpatik-row"><span></span><b></b></div>
+        <div class="simpatik-row"><span></span><b></b></div>
+        <div class="simpatik-row"><span></span><b></b></div>
+        <div class="simpatik-row"><span></span><b></b></div>
+      </div>
+    </div>
+  )}
+
+  {slug === 'cuanku' && (
+    <div class="css-visual-layer" aria-hidden="true">
+      <div class="cuanku-grid">
+        <div class="cuanku-card"></div>
+        <div class="cuanku-card"></div>
+        <div class="cuanku-wide">
+          <i></i><i></i><i></i>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+

@@ -14,50 +14,51 @@ export interface SectionTransform {
 // so the 3D model frames the sections without colliding with dense copy.
 const DESKTOP_TRANSFORMS: Record<string, SectionTransform> = {
   hero: {
-    pos: { x: 2.35, y: -0.12, z: 0.1 },
+    // Upper-right negative space, clear of BAYU (top-left) and MUTAWAKKIL (mid-right)
+    pos: { x: 2.15, y: 0.92, z: -0.15 },
     rot: { x: 0.24, y: -0.52, z: 0.06 },
-    scale: 1.1,
+    scale: 0.74,
   },
   'hero-step2': {
-    pos: { x: 2.45, y: 0.15, z: 0.15 },
+    pos: { x: 2.2, y: 0.96, z: -0.1 },
     rot: { x: 0.26, y: -0.42, z: 0.08 },
-    scale: 1.05,
+    scale: 0.72,
   },
   about: {
     // Positioned in bottom-right margin to leave manifesto copy crystal-clear
     pos: { x: 2.65, y: -0.85, z: 0.05 },
     rot: { x: 0.22, y: 0.42, z: -0.06 },
-    scale: 0.95,
+    scale: 0.9,
   },
   work: {
     // Upper-right above the carousel track
     pos: { x: 2.45, y: 1.35, z: -0.5 },
     rot: { x: 0.2, y: -0.62, z: 0.06 },
-    scale: 0.88,
+    scale: 0.82,
   },
   expertise: {
-    // Left flank beside vertical title, leaving bento grid clear
-    pos: { x: -2.35, y: -0.15, z: 0.1 },
+    // Top-left outer margin, clear of vertical title "WHAT I BRING" and card 01
+    pos: { x: -2.95, y: 1.12, z: -0.25 },
     rot: { x: 0.25, y: 0.62, z: -0.06 },
-    scale: 1.0,
+    scale: 0.54,
   },
   experience: {
-    // Upper-right above accordion cards
-    pos: { x: 2.3, y: 1.05, z: 0.05 },
+    // Mid-right negative space below "LEARNING IN PUBLIC" and above accordion cards
+    pos: { x: 2.55, y: 0.48, z: -0.25 },
     rot: { x: 0.26, y: -0.45, z: 0.05 },
-    scale: 0.92,
+    scale: 0.64,
   },
   principles: {
     // Bottom-left below heading, clear of principle rows
     pos: { x: -2.25, y: -0.82, z: 0.1 },
     rot: { x: 0.24, y: 0.52, z: -0.05 },
-    scale: 1.0,
+    scale: 0.9,
   },
   contact: {
     // Right margin leaving center CTA clear
     pos: { x: 2.15, y: 0.12, z: 0.15 },
     rot: { x: 0.22, y: -0.38, z: 0.04 },
-    scale: 1.15,
+    scale: 1.05,
   },
 };
 
@@ -211,15 +212,6 @@ export function initLaptop3D(canvas: HTMLCanvasElement): LaptopController | null
       const baseScale = 2.0 / (maxDim || 1);
       modelGroup.scale.setScalar(baseScale);
 
-      // Enable shadow support while retaining the model's authentic brand palette
-      model.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          const mesh = child as THREE.Mesh;
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
-        }
-      });
-
       modelGroup.add(model);
 
       // Reveal canvas once model is ready
@@ -336,7 +328,7 @@ export function initLaptop3D(canvas: HTMLCanvasElement): LaptopController | null
   window.addEventListener('section:change', onSectionChange);
 
   // Animation render loop — dirty rendering + throttled to ~30fps
-  const clock = new THREE.Clock();
+  const timer = new THREE.Timer();
   let animationFrameId: number;
   let lastFrameTime = 0;
   let loopRunning = true;
@@ -345,7 +337,6 @@ export function initLaptop3D(canvas: HTMLCanvasElement): LaptopController | null
   const startLoop = () => {
     if (loopRunning) return;
     loopRunning = true;
-    clock.start();
     animationFrameId = requestAnimationFrame(animate);
   };
 
@@ -364,7 +355,8 @@ export function initLaptop3D(canvas: HTMLCanvasElement): LaptopController | null
     }
     lastFrameTime = timestamp - (delta % FRAME_INTERVAL);
 
-    const time = clock.getElapsedTime();
+    timer.update(timestamp);
+    const time = timer.getElapsed();
 
     // Smooth mouse interpolation
     const prevMX = mouseX, prevMY = mouseY;

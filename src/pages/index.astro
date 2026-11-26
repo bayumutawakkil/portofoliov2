@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
+import ProjectVisual from '../components/ProjectVisual.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import {
   HeroExploreButton,
-  PortfolioDock,
   AvailabilityBadge,
   ContactActions,
   ProjectTilt,
@@ -14,9 +14,27 @@ import {
   EdgeProgressiveBlur,
 } from '../components/PortfolioUX';
 import { profile, capabilities, experience } from '../data/site';
-import { galleryProjects } from '../data/project-gallery';
+import { getOrderedProjects } from '../data/project-gallery';
+
+const galleryProjects = await getOrderedProjects();
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  jobTitle: profile.role,
+  url: siteUrl.toString(),
+  email: `mailto:${profile.email}`,
+  sameAs: [profile.github, profile.linkedin, profile.instagram].filter(Boolean),
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Padang',
+    addressCountry: 'ID',
+  },
+};
 ---
 <BaseLayout>
+  <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
   <div class="site-shell" id="top">
     <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
     <Nav />
@@ -35,7 +53,7 @@ import { galleryProjects } from '../data/project-gallery';
         <!-- Mobile (max-lg): Gaya sampul majalah editorial bernuansa depth & overlapping.
              Desktop (lg): komposisi stepped absolute (BAYU kiri / MUTAWAKKIL kanan, foto naik dari bawah). -->
         <div class="hero-main relative flex min-h-0 flex-1 flex-col items-center justify-center py-6 max-lg:py-8 lg:block lg:py-0">
-          <span class="sr-only" id="hero-title">Bayu Mutawakkil</span>
+          <h1 class="sr-only" id="hero-title">Bayu Mutawakkil</h1>
 
           <!-- Container magazine layout mobile: BAYU -> Foto menimpa (overlap) -> MUTAWAKKIL di belakang bawah foto -->
           <div class="relative max-lg:flex max-lg:flex-col max-lg:justify-center max-lg:items-center max-lg:isolate lg:contents">
@@ -74,8 +92,8 @@ import { galleryProjects } from '../data/project-gallery';
           </div>
         </div>
 
-        <div class="hero-bottom relative z-[4] mt-auto shrink-0 max-lg:mt-[clamp(16px,6vh,32px)]" data-hero-meta>
-          <p class="hero-intro reveal-up max-w-[46ch] max-lg:text-[12px] max-lg:leading-[1.55]">I’m <strong>Bayu Mutawakkil</strong> — an Information Systems student exploring the intersection of software engineering, business processes, and thoughtful digital experiences.</p>
+        <div class="hero-bottom relative z-[4] mt-auto shrink-0 max-lg:mt-[clamp(16px,6vh,32px)] lg:pb-16" data-hero-meta>
+          <p class="hero-intro reveal-up max-w-[46ch] max-lg:text-[14px] max-lg:leading-[1.55]">I’m <strong>Bayu Mutawakkil</strong> — an Information Systems student exploring the intersection of software engineering, business processes, and thoughtful digital experiences.</p>
           <div class="hero-actions reveal-up">
             <HeroExploreButton client:load />
             <a class="text-link max-lg:hidden" href="#about">More about me <span>↓</span></a>
@@ -86,7 +104,7 @@ import { galleryProjects } from '../data/project-gallery';
 
       <section class="manifesto section-pad flex h-auto min-h-[100svh] flex-col overflow-visible lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden" id="about">
         <div class="section-heading shrink-0"><span class="section-number">01 — THE APPROACH</span><span class="section-aside">A SYSTEMS-THINKING MINDSET</span></div>
-        <div class="manifesto-grid flex-1 items-center lg:min-h-0"><h2 class="manifesto-title" data-reveal-text>Technology is not the destination. <span><ShimmerLine client:visible text="It is the way we make better things possible." /></span></h2><div class="manifesto-copy lg:min-h-0"><span class="eyebrow">A LITTLE CONTEXT</span><p>I study Information Systems at Universitas Andalas, where technology meets people, processes, and organizations. I’m interested in building software that does more than look good: software that solves a real problem and holds up beyond the demo.</p><p>My curiosity moves between backend logic, interface engineering, data, and enterprise systems. I enjoy understanding the whole picture before deciding what to build.</p><a class="inline-link" href="https://github.com/bayumutawakkil" target="_blank" rel="noreferrer">Explore my GitHub <span>↗</span></a></div></div>
+        <div class="manifesto-grid flex-1 items-center lg:min-h-0"><h2 class="manifesto-title" data-reveal-text>Technology is not the destination. <span><ShimmerLine client:visible text="It is the way we make better things possible." /></span></h2><div class="manifesto-copy lg:min-h-0"><span class="eyebrow">A LITTLE CONTEXT</span><p>I study Information Systems at Universitas Andalas, where technology meets people, processes, and organizations. I’m interested in building software that does more than look good: software that solves a real problem and holds up beyond the demo.</p><p>My curiosity moves between backend logic, interface engineering, data, and enterprise systems. I enjoy understanding the whole picture before deciding what to build.</p><a class="inline-link" href={profile.github} target="_blank" rel="noreferrer">Explore my GitHub <span>↗</span></a></div></div>
       </section>
 
       <!-- Desktop: strict 100dvh dengan fullpage/Observer. Mobile: fluid, stacked, native scroll. -->
@@ -97,43 +115,48 @@ import { galleryProjects } from '../data/project-gallery';
       >
         <!-- Section label stays at the top-left, matching the other section headers. -->
         <div class="work-label pointer-events-none absolute left-[clamp(24px,7.1vw,112px)] z-[51]">
-          <span class="section-number block">02 — SELECTED PROJECTS</span>
+          <span class="section-number block">02 — SELECTED WORKS</span>
         </div>
 
         <!-- On desktop, the title is anchored to the left and centered vertically above the slider. -->
         <div class="pointer-events-none relative z-[60] shrink-0 pt-2 text-left lg:absolute lg:left-[clamp(24px,7.1vw,112px)] lg:top-1/2 lg:-translate-y-1/2 lg:pt-0">
-          <h2 id="work-title" class="m-0 mt-1 font-[var(--display)] text-[clamp(2rem,9vw,3.25rem)] font-semibold leading-[0.86] tracking-[-0.06em] text-white [text-shadow:0_8px_28px_rgba(0,0,0,0.55),0_2px_8px_rgba(77,159,255,0.18)] lg:mt-2 lg:text-[clamp(56px,11vw,180px)] lg:leading-[0.82] lg:tracking-[-0.07em] lg:text-white">Projects</h2>
+          <h2 id="work-title" class="m-0 mt-1 font-[var(--display)] text-[clamp(2rem,9vw,3.25rem)] font-semibold leading-[0.86] tracking-[-0.06em] text-white [text-shadow:0_8px_28px_rgba(0,0,0,0.55),0_2px_8px_rgba(77,159,255,0.18)] lg:mt-2 lg:text-[clamp(56px,11vw,180px)] lg:leading-[0.82] lg:tracking-[-0.07em] lg:text-white">Works</h2>
         </div>
 
         <!-- Slider: flex-1 + min-h-0 agar muat 100dvh; swipe horizontal untuk geser proyek -->
-        <div class="works-stage relative flex min-h-0 w-full flex-1 items-center" data-drag-gallery role="region" aria-roledescription="carousel" aria-label="Selected projects" tabindex="0">
+        <div class="works-stage relative flex min-h-0 w-full flex-1 items-center" data-drag-gallery role="region" aria-roledescription="carousel" aria-label="Selected works" tabindex="0">
           <div class="works-stage-top"><span data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span></div>
           <div class="project-list" data-gallery-track>
-            {galleryProjects.map((project, index) => (
-              <article class={`project-card project-${project.accent}`} data-project-card data-category={project.category} data-gallery-card data-index={index}>
-                <a class="project-card-link" href={`/projects/${project.slug}`} aria-label={`Read case study: ${project.title}`}>
-                  <ProjectTilt client:visible>
-                    <div class="project-visual">
-                      <img src={project.image} alt="" loading="lazy" decoding="async" fetchpriority="low" style={`object-position:${project.position}`} />
-                      <div class="project-visual-wash"></div>
-                      <div class="visual-top"><span>CASE STUDY / {String(index + 1).padStart(2, '0')}</span><span>{project.year}</span></div>
-                      <span class="visual-watermark">{String(index + 1).padStart(2, '0')}</span>
-                      <span class="visual-open">OPEN PROJECT <b>↗</b></span>
+            {galleryProjects.map((entry, index) => {
+              const project = entry.data;
+              const title = project.shortTitle ?? project.title;
+              const category = project.shortCategory ?? project.category;
+              return (
+                <article class={`project-card project-${project.accent}`} data-project-card data-category={category} data-gallery-card data-index={index}>
+                  <a class="project-card-link" href={`/projects/${entry.id}`} aria-label={`Read case study: ${project.title}`}>
+                    <ProjectTilt client:visible>
+                      <div class="project-visual">
+                        <ProjectVisual slug={entry.id} title={title} category={category} accent={project.accent} />
+                        <div class="project-visual-wash"></div>
+                        <div class="visual-top"><span>CASE STUDY / {String(index + 1).padStart(2, '0')}</span><span>{project.year}</span></div>
+                        <span class="visual-watermark">{String(index + 1).padStart(2, '0')}</span>
+                        <span class="visual-open">OPEN PROJECT <b>↗</b></span>
+                      </div>
+                    </ProjectTilt>
+                    <div class="project-info">
+                      <div class="project-meta"><span>{category}</span><span>{project.year}</span></div>
+                      <div class="project-title-row"><h3>{title}</h3><span class="project-link" aria-hidden="true">↗</span></div>
                     </div>
-                  </ProjectTilt>
-                  <div class="project-info">
-                    <div class="project-meta"><span>{project.category}</span><span>{project.year}</span></div>
-                    <div class="project-title-row"><h3>{project.title}</h3><span class="project-link" aria-hidden="true">↗</span></div>
-                  </div>
-                </a>
-              </article>
-            ))}
+                  </a>
+                </article>
+              );
+            })}
           </div>
           <Button variant="outline" size="icon" className="works-nav works-nav-prev rounded-full border-white/15 bg-white/[0.04] text-foreground hover:bg-white/10" type="button" data-gallery-prev aria-label="Previous project">←</Button>
           <Button variant="outline" size="icon" className="works-nav works-nav-next rounded-full border-white/15 bg-white/[0.04] text-foreground hover:bg-white/10" type="button" data-gallery-next aria-label="Next project">→</Button>
         </div>
 
-        <div class="work-foot z-[6] shrink-0 pt-[clamp(6px,1.2vh,14px)]"><span>2023 — 2026</span><a href="https://github.com/bayumutawakkil" target="_blank" rel="noreferrer">VIEW ALL PROJECTS <span>↗</span></a></div>
+        <div class="work-foot z-[6] shrink-0 pt-[clamp(6px,1.2vh,14px)]"><span>2023 — 2026</span><a href="/projects">VIEW ALL WORKS <span>↗</span></a></div>
       </section>
 
       <!-- 03 — WHAT I BRING: Desktop strict 100dvh with fullpage; Mobile fluid stacked -->
@@ -142,7 +165,7 @@ import { galleryProjects } from '../data/project-gallery';
         aria-labelledby="expertise-title"
         class="relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col overflow-hidden px-[clamp(16px,4.5vw,72px)] py-12 max-lg:py-16 lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:py-[clamp(8px,1.6vh,18px)] lg:overflow-hidden"
       >
-        <div class="mx-auto flex h-auto max-h-full min-h-0 w-full max-w-[1060px] flex-col gap-6 max-lg:gap-8 lg:my-auto lg:flex-row lg:items-center lg:gap-10 lg:pb-12">
+        <div class="mx-auto flex h-auto max-h-full min-h-0 w-full max-w-[1060px] flex-col gap-6 max-lg:gap-8 lg:my-auto lg:flex-row lg:items-center lg:gap-10">
           <!-- Judul: mobile horizontal/atas (tengah, full width); desktop vertikal di kiri -->
           <div class="flex w-full shrink-0 items-center justify-center max-lg:text-center max-lg:mb-2 lg:h-auto lg:min-h-0 lg:w-[clamp(48px,14%,130px)] lg:justify-center lg:overflow-hidden">
             <div class="flex items-center gap-3 max-lg:flex-col lg:min-h-0 lg:flex-col lg:gap-[clamp(6px,1vh,14px)]">
@@ -159,7 +182,7 @@ import { galleryProjects } from '../data/project-gallery';
             {capabilities.map((item, i) => (
               <article
                 class:list={[
-                  'cap-card group relative flex h-auto flex-col justify-between overflow-visible rounded-2xl lg:h-full lg:min-h-0 lg:overflow-hidden lg:rounded-3xl',
+                  'cap-card group relative flex h-auto flex-col justify-between overflow-visible rounded-2xl lg:h-full lg:min-h-0 lg:overflow-hidden',
                   'border border-white/[0.08] bg-gradient-to-br from-white/[0.08] to-transparent',
                   'p-5 sm:p-6 backdrop-blur-sm bg-[rgba(4,11,26,0.55)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:p-[clamp(0.6rem,1.8vh,1.2rem)]',
                   'transition-all duration-300 ease-out',
@@ -168,26 +191,31 @@ import { galleryProjects } from '../data/project-gallery';
                   i % 2 === 1 && 'lg:translate-y-[clamp(4px,1vh,12px)] lg:hover:translate-y-[calc(clamp(4px,1vh,12px)-4px)]',
                 ]}
               >
+                <div
+                  class="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style="background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), rgba(77, 159, 255, 0.14), transparent 65%);"
+                  aria-hidden="true"
+                ></div>
                 <div class="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#4d9fff]/0 blur-2xl transition-all duration-300 group-hover:bg-[#4d9fff]/15"></div>
 
-                <div class="flex shrink-0 items-start justify-between gap-1">
-                  <Badge variant="outline" className="cap-id border-[#4d9fff]/30 bg-[#4d9fff]/10 font-[var(--mono)] text-[10px] tracking-[0.14em] text-[#4d9fff]">{item.id}</Badge>
-                  <span class="text-white/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#82d8ed]">↗</span>
+                <div class="relative z-[1] flex shrink-0 items-start justify-between gap-1">
+                  <Badge variant="outline" className="cap-id rounded-md border-[#4d9fff]/30 bg-[#4d9fff]/10 font-[var(--mono)] text-[10px] tracking-[0.14em] text-[#7ec0ff]">{item.id}</Badge>
+                  <span class="text-white/50 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#82d8ed]">↗</span>
                 </div>
 
-                <div class="mt-3 min-h-0 flex-1 lg:mt-[clamp(4px,0.8vh,10px)]">
+                <div class="relative z-[1] mt-3 min-h-0 flex-1 lg:mt-[clamp(4px,0.8vh,10px)]">
                   <h3 class="m-0 font-[var(--display)] text-[1.15rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white lg:text-[clamp(0.95rem,1.8vh,1.35rem)] lg:line-clamp-2">{item.title}</h3>
-                  <p class="m-0 mt-2.5 text-[0.88rem] leading-[1.65] text-white/80 max-lg:line-clamp-none lg:mt-[clamp(3px,0.6vh,8px)] lg:text-[clamp(0.72rem,1.15vh,0.875rem)] lg:leading-[1.45] lg:[display:-webkit-box] lg:[-webkit-box-orient:vertical] lg:[-webkit-line-clamp:2] lg:overflow-hidden">{item.desc}</p>
+                  <p class="m-0 mt-2.5 text-[14px] leading-[1.65] text-[#c7d9ea] max-lg:line-clamp-none lg:mt-[clamp(3px,0.6vh,8px)] lg:text-[14px] lg:leading-[1.45] lg:[display:-webkit-box] lg:[-webkit-box-orient:vertical] lg:[-webkit-line-clamp:2] lg:overflow-hidden">{item.desc}</p>
                 </div>
 
-                <div class="mt-5 shrink-0 pt-2 font-[var(--mono)] text-[0.72rem] uppercase tracking-wider text-white/60 max-lg:line-clamp-none lg:mt-auto lg:pt-[clamp(4px,0.8vh,10px)] lg:text-[clamp(0.55rem,0.85vh,0.72rem)] lg:[display:-webkit-box] lg:[-webkit-box-orient:vertical] lg:[-webkit-line-clamp:1] lg:overflow-hidden">{item.tags}</div>
+                <div class="relative z-[1] mt-5 shrink-0 pt-2 font-[var(--mono)] text-[10px] uppercase tracking-wider text-[#b3c9de] max-lg:line-clamp-none lg:mt-auto lg:pt-[clamp(4px,0.8vh,10px)] lg:text-[10px] lg:[display:-webkit-box] lg:[-webkit-box-orient:vertical] lg:[-webkit-line-clamp:1] lg:overflow-hidden">{item.tags}</div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <!-- 04 — EXPERIENCE: Desktop strict accordion (Observer). Mobile vertical list, all open, native scroll -->
+      <!-- 04 — EXPERIENCE: Desktop accordion (first card open by default, hover/focus/tap); Mobile tappable cards -->
       <section
         class="experience section-pad relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden"
         id="experience"
@@ -200,63 +228,72 @@ import { galleryProjects } from '../data/project-gallery';
             id="experience-title"
             class="m-0 mt-[clamp(6px,1.2vh,14px)] font-[var(--display)] text-[clamp(1.8rem,6vw,3.6rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-[#e9f2fc]"
           >
-            Learning through<br /><span class="text-[#66819e]">real systems.</span>
+            Learning through<br /><span class="text-[#8ba7c4]">real systems.</span>
           </h2>
         </div>
 
-        <!-- Desktop: horizontal accordion; Mobile: vertical list, all open -->
-        <div class="mt-[clamp(12px,2vh,24px)] flex w-full min-h-0 flex-1 flex-col gap-6 max-lg:gap-8 lg:mb-10 lg:max-h-[clamp(300px,46vh,420px)] lg:flex-row lg:gap-0 lg:overflow-hidden lg:rounded-2xl lg:border lg:border-white/[0.06] lg:bg-white/[0.015]">
+        <!-- Desktop: horizontal accordion (first card active by default); Mobile: tappable vertical cards -->
+        <div class="exp-accordion mt-[clamp(12px,2vh,24px)] flex w-full min-h-0 flex-1 flex-col gap-4 max-lg:gap-5 lg:mb-6 lg:max-h-[clamp(300px,46vh,420px)] lg:flex-row lg:gap-0 lg:overflow-hidden lg:rounded-2xl lg:border lg:border-white/[0.06] lg:bg-white/[0.015]" data-exp-accordion>
           {experience.map((item, i) => (
             <article
               class:list={[
-                'group relative flex min-h-0 min-w-0 flex-col overflow-visible lg:overflow-hidden',
+                'exp-card group relative flex min-h-0 min-w-0 cursor-pointer flex-col overflow-visible lg:overflow-hidden',
                 'rounded-2xl border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.01] backdrop-blur-sm bg-[rgba(4,11,26,0.55)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:rounded-none lg:border-t lg:border-l-0 lg:border-white/10 lg:first:border-t-0 lg:border-l lg:first:border-l-0',
                 'transition-[flex-grow,flex-basis,background-color,opacity] duration-500 ease-in-out',
-                // desktop: horizontal accordion (hover/focus)
-                'lg:h-full lg:flex-1 lg:basis-0 lg:hover:flex-[3] lg:hover:bg-white/[0.055] lg:focus-within:flex-[3] lg:focus-within:bg-white/[0.055]',
+                'lg:h-full lg:flex-1 lg:basis-0',
+                i === 0 && 'is-active',
               ]}
+              data-exp-card
+              data-exp-index={i}
               tabindex="0"
+              aria-expanded={i === 0 ? 'true' : 'false'}
               aria-label={`${item.period} — ${item.title}`}
             >
-              <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4d9fff]/0 to-transparent transition-all duration-700 lg:group-hover:via-[#4d9fff]/40 lg:group-focus-within:via-[#4d9fff]/40"></div>
+              <div class="exp-card-top-line pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4d9fff]/0 to-transparent transition-all duration-700"></div>
 
               <div class="relative flex h-full min-h-0 w-full flex-col overflow-visible p-6 sm:p-7 lg:overflow-hidden lg:p-[clamp(12px,2vh,22px)]">
-                {/* Mobile: always visible header + content (Vertical List elegan & bernapas) */}
+                {/* Mobile: header always visible; detail expands on tap/focus */}
                 <div class="flex w-full items-start justify-between gap-4 lg:hidden">
                   <div class="flex min-w-0 flex-col gap-1.5">
-                    <span class="font-[var(--mono)] text-[10.5px] font-medium tracking-[0.14em] text-[#4d9fff]">{item.period}</span>
+                    <span class="font-[var(--mono)] text-[11px] font-medium tracking-[0.14em] text-[#7ec0ff]">{item.period}</span>
                     <h3 class="m-0 font-[var(--display)] text-[1.2rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white">{item.title}</h3>
-                    <p class="m-0 font-[var(--mono)] text-[10px] uppercase tracking-[0.12em] text-[#82d8ed]/90">{item.organization}</p>
+                    <p class="m-0 font-[var(--mono)] text-[10px] uppercase tracking-[0.12em] text-[#9de3f5]">{item.organization}</p>
                   </div>
-                  <span class="shrink-0 font-[var(--mono)] text-[11px] font-medium text-white/40">0{i + 1}</span>
+                  <div class="flex shrink-0 items-center gap-2.5 pt-0.5">
+                    <span class="font-[var(--mono)] text-[11px] font-medium text-[#b5c8dc]">0{i + 1}</span>
+                    <svg class="exp-chevron size-4 text-[#7ec0ff] transition-transform duration-300 group-[.is-active]:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  </div>
                 </div>
-                <div class="mt-4 flex flex-col lg:hidden">
-                  <p class="m-0 text-[0.88rem] leading-[1.68] text-white/75">{item.detail}</p>
+                <div class="exp-mobile-detail mt-4 flex flex-col lg:hidden">
+                  <p class="m-0 text-[14px] leading-[1.68] text-[#cddceb]">{item.detail}</p>
                 </div>
 
-                {/* ── Desktop: kondisi normal/menyusut (vertikal) ── */}
-                <div class="absolute inset-0 hidden flex-col items-center justify-between p-[clamp(10px,1.8vh,18px)] opacity-100 transition-all duration-500 ease-in-out lg:flex lg:group-hover:pointer-events-none lg:group-hover:opacity-0 lg:group-focus-within:pointer-events-none lg:group-focus-within:opacity-0">
-                  <span class="font-[var(--mono)] text-[clamp(9px,1vh,11px)] tracking-[0.16em] text-[#4d9fff]">{item.period}</span>
+                {/* ── Desktop: collapsed vertical strip ── */}
+                <div class="exp-collapsed absolute inset-0 hidden flex-col items-center justify-between p-[clamp(10px,1.8vh,18px)] opacity-100 transition-all duration-500 ease-in-out lg:flex">
+                  <span class="font-[var(--mono)] text-[10px] tracking-[0.16em] text-[#7ec0ff]">{item.period}</span>
                   <h3 class="m-0 rotate-180 font-[var(--display)] text-[clamp(0.95rem,2.2vh,1.35rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#e9f2fc] [writing-mode:vertical-rl]">
                     {item.title}
                   </h3>
-                  <span class="font-[var(--mono)] text-[10px] text-white/25">0{i + 1}</span>
+                  <div class="flex flex-col items-center gap-1.5">
+                    <span class="font-[var(--mono)] text-[10px] text-[#9db4ca]">0{i + 1}</span>
+                    <span class="text-xs text-[#7ec0ff]/80" aria-hidden="true">+</span>
+                  </div>
                 </div>
 
-                {/* ── Desktop: kondisi lebar (hover/focus), konten horizontal penuh ── */}
-                <div class="pointer-events-none hidden h-full min-h-0 translate-y-2 flex-col opacity-0 transition-all duration-500 delay-150 ease-in-out lg:flex lg:group-hover:pointer-events-auto lg:group-hover:translate-y-0 lg:group-hover:opacity-100 lg:group-hover:delay-300 lg:group-focus-within:pointer-events-auto lg:group-focus-within:translate-y-0 lg:group-focus-within:opacity-100 lg:group-focus-within:delay-300">
+                {/* ── Desktop: expanded horizontal content ── */}
+                <div class="exp-expanded pointer-events-none hidden h-full min-h-0 translate-y-2 flex-col opacity-0 transition-all duration-500 ease-in-out lg:flex">
                   <div class="flex shrink-0 items-center justify-between gap-3">
-                    <span class="font-[var(--mono)] text-[clamp(9px,1vh,11px)] tracking-[0.16em] text-[#4d9fff]">{item.period}</span>
-                    <span class="font-[var(--mono)] text-[10px] text-white/30">0{i + 1}</span>
+                    <span class="font-[var(--mono)] text-[10px] tracking-[0.16em] text-[#7ec0ff]">{item.period}</span>
+                    <span class="font-[var(--mono)] text-[10px] text-[#9db4ca]">0{i + 1}</span>
                   </div>
                   <div class="mt-auto min-h-0 overflow-hidden pb-[clamp(2px,0.6vh,8px)]">
                     <h3 class="m-0 font-[var(--display)] text-[clamp(1.15rem,2.8vh,2rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-white [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
                       {item.title}
                     </h3>
-                    <p class="m-0 mt-[clamp(4px,0.8vh,10px)] font-[var(--mono)] text-[clamp(9px,1vh,11px)] uppercase tracking-[0.12em] text-[#82d8ed]/85 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1] overflow-hidden">
+                    <p class="m-0 mt-[clamp(4px,0.8vh,10px)] font-[var(--mono)] text-[10px] uppercase tracking-[0.12em] text-[#9de3f5] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1] overflow-hidden">
                       {item.organization}
                     </p>
-                    <p class="m-0 mt-[clamp(6px,1.1vh,14px)] max-w-[46ch] text-[clamp(0.72rem,1.2vh,0.95rem)] leading-[1.55] text-white/60 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
+                    <p class="m-0 mt-[clamp(6px,1.1vh,14px)] max-w-[46ch] text-[14px] leading-[1.55] text-[#cddceb] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
                       {item.detail}
                     </p>
                   </div>
@@ -278,15 +315,19 @@ import { galleryProjects } from '../data/project-gallery';
           <AvailabilityBadge client:visible label="OPEN TO COLLABORATION & OPPORTUNITIES" />
           <h2>Have a problem<br/>worth <span>solving?</span></h2>
           <p>I’m always interested in thoughtful conversations, meaningful projects, and opportunities to learn through building.</p>
-          <ContactActions client:visible email={profile.email} />
+          <ContactActions client:visible email={profile.email} cvUrl={profile.cvUrl} />
         </div>
         <div class="contact-footer">
           <div class="footer-bottom"><span>© {new Date().getFullYear()} BAYU MUTAWAKKIL</span><span>DESIGN & ENGINEERING</span></div>
-          <div class="contact-links shrink-0"><a href={profile.github} target="_blank" rel="noreferrer">GITHUB <span>↗</span></a><a href={profile.linkedin} target="_blank" rel="noreferrer">LINKEDIN <span>↗</span></a><a href={profile.instagram} target="_blank" rel="noreferrer">INSTAGRAM <span>↗</span></a><a href={`mailto:${profile.email}`}>EMAIL <span>↗</span></a></div>
+          <div class="contact-links shrink-0">
+            {profile.github && <a href={profile.github} target="_blank" rel="noreferrer">GITHUB <span>↗</span></a>}
+            {profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer">LINKEDIN <span>↗</span></a>}
+            {profile.instagram && <a href={profile.instagram} target="_blank" rel="noreferrer">INSTAGRAM <span>↗</span></a>}
+            {profile.email && <a href={`mailto:${profile.email}`}>EMAIL <span>↗</span></a>}
+          </div>
         </div>
       </section>
     </main>
-    <PortfolioDock client:idle />
     <EdgeProgressiveBlur client:idle />
     <div class="cursor-glow" data-cursor-glow></div>
   </div>
@@ -298,12 +339,39 @@ import { galleryProjects } from '../data/project-gallery';
         const x = e.clientX;
         const y = e.clientY;
         rafId = requestAnimationFrame(() => {
-          rafId = 0;
           const r = c.getBoundingClientRect();
           c.style.setProperty('--mx', `${x - r.left}px`);
           c.style.setProperty('--my', `${y - r.top}px`);
+          rafId = 0;
         });
-      }, { passive: true });
+      });
     });
+
+    const expAccordion = document.querySelector<HTMLElement>('[data-exp-accordion]');
+    if (expAccordion) {
+      const cards = Array.from(expAccordion.querySelectorAll<HTMLElement>('[data-exp-card]'));
+      const activate = (target: HTMLElement) => {
+        cards.forEach((card) => {
+          const active = card === target;
+          card.classList.toggle('is-active', active);
+          card.setAttribute('aria-expanded', String(active));
+        });
+      };
+      cards.forEach((card) => {
+        card.addEventListener('pointerenter', () => {
+          if (window.matchMedia('(min-width: 1024px)').matches) activate(card);
+        });
+        card.addEventListener('focusin', () => activate(card));
+        card.addEventListener('click', () => {
+          const isAlready = card.classList.contains('is-active');
+          if (window.matchMedia('(max-width: 1023px)').matches) {
+            card.classList.toggle('is-active', !isAlready);
+            card.setAttribute('aria-expanded', String(!isAlready));
+          } else {
+            activate(card);
+          }
+        });
+      });
+    }
   </script>
 </BaseLayout>

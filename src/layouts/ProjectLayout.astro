@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
 import Nav from '../components/Nav.astro';
+import ProjectVisual from '../components/ProjectVisual.astro';
 import { Badge } from '../components/ui/badge';
 import { buttonVariants } from '../components/ui/button';
 import { Separator } from '../components/ui/separator';
@@ -13,36 +14,70 @@ interface Props {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
-const all = (await getCollection('projects')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const index = all.findIndex((p) => p.id === project.id);
 const next = all[(index + 1) % all.length];
+
+const caseStudySections = [
+  { label: 'Role', value: project.data.role },
+  { label: 'Problem', value: project.data.problem },
+  { label: 'Decision', value: project.data.decision },
+  { label: 'Outcome', value: project.data.outcome },
+].filter((sec): sec is { label: string; value: string } => Boolean(sec.value));
 ---
 <BaseLayout title={`${project.data.title} — Bayu Mutawakkil`} description={project.data.summary}>
   <Nav />
   <main class="project-detail section-pad">
-    <a class="detail-back" href="/#work"><ArrowLeft size={14} aria-hidden="true" /> Back to selected work</a>
-    <div class={`detail-visual project-${project.data.accent}`} aria-hidden="true">
-      <span>{project.data.category}</span>
-      <strong>{project.data.title}</strong>
-      <small>{project.data.year} / {project.data.status}</small>
+    <div class="detail-shell">
+      <a class="detail-back" href="/projects"><ArrowLeft size={14} aria-hidden="true" /> Back to works</a>
+      <div class={`detail-visual project-${project.data.accent}`}>
+        <ProjectVisual
+          slug={project.id}
+          title={project.data.title}
+          category={project.data.category}
+          accent={project.data.accent}
+        />
+        <span>{project.data.category}</span>
+        <small>{project.data.year} / {project.data.status}</small>
+      </div>
+      <article class="detail-copy">
+        <p class="eyebrow">CASE STUDY / {project.data.year}</p>
+        <h1>{project.data.title}</h1>
+        <p class="detail-summary" lang="id">{project.data.summary}</p>
+        {project.data.stack.length > 0 && (
+          <div class="detail-tags">
+            {project.data.stack.map((tag) => (
+              <Badge variant="outline" className="rounded-md border-white/15 bg-white/[0.03] px-2.5 py-1 font-[var(--mono)] text-[10px] text-[#c1d5e8]">{tag}</Badge>
+            ))}
+          </div>
+        )}
+        <Separator className="my-8 bg-white/10" />
+        <div class="detail-prose" lang="id"><Content /></div>
+
+        {caseStudySections.length > 0 && (
+          <section class="detail-structured" aria-label="Case study summary" lang="id">
+            {caseStudySections.map((sec) => (
+              <div class="detail-structured-item">
+                <h2>{sec.label}</h2>
+                <p>{sec.value}</p>
+              </div>
+            ))}
+          </section>
+        )}
+
+        <div class="mt-8">
+          <a class={`${buttonVariants({ variant: 'default', size: 'lg' })} h-[50px] gap-8 rounded-md px-[17px] text-[11px] font-bold`} href={project.data.externalUrl} target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={16} aria-hidden="true" /></a>
+        </div>
+      </article>
+      {next && next.id !== project.id && (
+        <nav class="detail-next" aria-label="Next project">
+          <a href={`/projects/${next.id}`}>
+            <span>NEXT CASE STUDY</span>
+            <strong>{next.data.title}</strong>
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </a>
+        </nav>
+      )}
     </div>
-    <article class="detail-copy">
-      <p class="eyebrow">CASE STUDY / {project.data.year}</p>
-      <h1>{project.data.title}</h1>
-      <p class="detail-summary">{project.data.summary}</p>
-      <div class="detail-tags">{project.data.stack.map((tag) => <Badge variant="outline" className="rounded-none border-white/15 bg-white/[0.03] px-2.5 py-1 font-[var(--mono)] text-[10px] text-[#a7c0d8]">{tag}</Badge>)}</div>
-      <Separator className="my-8 bg-white/10" />
-      <div class="detail-prose"><Content /></div>
-      <a class={`${buttonVariants({ variant: 'default', size: 'lg' })} h-[50px] gap-8 rounded-none px-[17px] text-[11px] font-bold`} href={project.data.externalUrl} target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={16} aria-hidden="true" /></a>
-    </article>
-    {next && next.id !== project.id && (
-      <nav class="detail-next" aria-label="Next project">
-        <a href={`/projects/${next.id}`}>
-          <span>NEXT CASE STUDY</span>
-          <strong>{next.data.title}</strong>
-          <ArrowUpRight size={18} aria-hidden="true" />
-        </a>
-      </nav>
-    )}
   </main>
 </BaseLayout>

@@ -8,6 +8,7 @@ const {
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
 const canonical = new URL(Astro.url.pathname, siteUrl).toString();
+// TODO(placeholder): Ganti /bg-hero.jpg dengan gambar Open Graph khusus (1200x630) di public/
 const ogImage = new URL('/bg-hero.jpg', siteUrl).toString();
 ---
 <!doctype html>

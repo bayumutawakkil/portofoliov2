@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
-import { galleryProjects } from '../../data/project-gallery';
+import ProjectVisual from '../../components/ProjectVisual.astro';
+import { getOrderedProjects } from '../../data/project-gallery';
+
+const galleryProjects = await getOrderedProjects();
 ---
 <BaseLayout title="Works — Bayu Mutawakkil" description="A selection of systems, experiments, and digital work.">
   <div class="projects-gallery-page">
@@ -9,32 +12,37 @@ import { galleryProjects } from '../../data/project-gallery';
     <main class="projects-gallery" data-drag-gallery role="region" aria-roledescription="carousel" aria-labelledby="gallery-title" tabindex="0">
       <a class="gallery-back" href="/">← Back home</a>
       <div class="gallery-heading">
-        <p>PROJECT ARCHIVE / {galleryProjects.length} WORKS</p>
+        <p>WORKS ARCHIVE / {galleryProjects.length} WORKS</p>
         <h1 id="gallery-title">WORKS</h1>
         <span class="gallery-count" data-gallery-progress aria-live="polite" aria-atomic="true">01 / {String(galleryProjects.length).padStart(2, '0')}</span>
       </div>
       <div class="gallery-track-wrap">
         <div class="gallery-track" data-gallery-track>
-          {galleryProjects.map((project, index) => (
-            <a
-              href={`/projects/${project.slug}`}
-              class={`gallery-card gallery-card-${project.accent}`}
-              data-gallery-card
-              data-index={index}
-              aria-label={`Open ${project.title} project`}
-            >
-              <span class="gallery-card-number">{String(index + 1).padStart(2, '0')}</span>
-              <div class="gallery-card-image">
-                <img src={project.image} alt="" loading={index < 2 ? 'eager' : 'lazy'} style={`object-position:${project.position}`} />
-                <span class="gallery-card-mark">↗</span>
-              </div>
-              <div class="gallery-card-meta">
-                <h2>{project.title}</h2>
-                <span>{project.year}</span>
-                <small>{project.category}</small>
-              </div>
-            </a>
-          ))}
+          {galleryProjects.map((entry, index) => {
+            const project = entry.data;
+            const title = project.shortTitle ?? project.title;
+            const category = project.shortCategory ?? project.category;
+            return (
+              <a
+                href={`/projects/${entry.id}`}
+                class={`gallery-card gallery-card-${project.accent}`}
+                data-gallery-card
+                data-index={index}
+                aria-label={`Open ${project.title} case study`}
+              >
+                <span class="gallery-card-number">{String(index + 1).padStart(2, '0')}</span>
+                <div class="gallery-card-image">
+                  <ProjectVisual slug={entry.id} title={title} category={category} accent={project.accent} />
+                  <span class="gallery-card-mark">↗</span>
+                </div>
+                <div class="gallery-card-meta">
+                  <h2>{title}</h2>
+                  <span>{project.year}</span>
+                  <small>{category}</small>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </div>
       <div class="gallery-footer">
