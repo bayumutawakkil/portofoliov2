@@ -1,8 +1,12 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  integrations: [react()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   // Update this if the creative build is deployed to a different domain.
   site: 'https://portofoliov2.vercel.app',
 });

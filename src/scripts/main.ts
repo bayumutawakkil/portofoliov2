@@ -3,6 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import SplitType from 'split-type';
 import { initFullpage } from './fullpage';
+import type { LaptopController } from './laptop-3d';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,7 +30,16 @@ const initActiveNav = () => {
     });
   };
   const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if (entry.isIntersecting) setActive(entry.target.id); });
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setActive(entry.target.id);
+        window.dispatchEvent(
+          new CustomEvent('section:change', {
+            detail: { sectionId: entry.target.id },
+          })
+        );
+      }
+    });
   }, { rootMargin: '-45% 0px -45% 0px' });
   map.forEach((_, id) => {
     const section = document.getElementById(id);
@@ -117,24 +127,33 @@ const init = () => {
 
       const setPosition = (v: number) => { state.x = v; recycleTrack(); renderPosition(); };
 
-      // 3-D cylinder + elastic drag transform
+      // 3-D cylinder + elastic drag transform (batch DOM reads before writes)
       const applyDragTransform = () => {
-        const gc   = gallery.getBoundingClientRect();
-        const mid  = gc.left + gallery.clientWidth * 0.5;
-        const spd  = Math.max(-12, Math.min(12, velocity * 0.35));
-        galleryCards.forEach(card => {
-          const cr    = card.getBoundingClientRect();
-          const ratio = Math.max(-1.5, Math.min(1.5, (cr.left + card.offsetWidth / 2 - mid) / (gallery.clientWidth * 0.45)));
-          gsap.set(card, { rotateY: ratio * 24, rotateZ: ratio * spd * -0.4, skewY: spd * 0.25, z: -Math.abs(ratio) * 65, scale: 1, overwrite: 'auto' });
+        const galleryWidth = gallery.clientWidth;
+        const mid = gallery.getBoundingClientRect().left + galleryWidth * 0.5;
+        const denom = galleryWidth * 0.45;
+        const ratios = galleryCards.map(card => {
+          const cr = card.getBoundingClientRect();
+          return Math.max(-1.5, Math.min(1.5, (cr.left + cr.width / 2 - mid) / denom));
+        });
+        galleryCards.forEach((card, i) => {
+          const ratio = ratios[i];
+          gsap.set(card, { rotateY: ratio * 14, z: -Math.abs(ratio) * 36, overwrite: 'auto' });
         });
       };
 
       const resetDragTransform = () => {
-        const mid = gallery.getBoundingClientRect().left + gallery.clientWidth * 0.5;
-        galleryCards.forEach(card => {
-          const ratio = Math.max(-1.5, Math.min(1.5, (card.getBoundingClientRect().left + card.offsetWidth / 2 - mid) / (gallery.clientWidth * 0.45)));
+        const galleryWidth = gallery.clientWidth;
+        const mid = gallery.getBoundingClientRect().left + galleryWidth * 0.5;
+        const denom = galleryWidth * 0.45;
+        const ratios = galleryCards.map(card => {
+          const cr = card.getBoundingClientRect();
+          return Math.max(-1.5, Math.min(1.5, (cr.left + cr.width / 2 - mid) / denom));
+        });
+        galleryCards.forEach((card, i) => {
+          const ratio = ratios[i];
           gsap.killTweensOf(card);
-          gsap.to(card, { rotateY: ratio * 24, rotateZ: 0, skewY: 0, x: 0, y: 0, z: -Math.abs(ratio) * 65, scale: 1, duration: 0.8, ease: 'elastic.out(1.15,0.45)', overwrite: 'auto' });
+          gsap.to(card, { rotateY: ratio * 14, x: 0, y: 0, z: -Math.abs(ratio) * 36, scale: 1, duration: 0.42, ease: 'power2.out', overwrite: 'auto' });
         });
       };
 
@@ -265,11 +284,22 @@ const init = () => {
       };
     }
 
-    // ── Cursor glow ───────────────────────────────────────────────────
+    // ── Cursor glow (quickTo avoids creating new tweens on every pointermove) ──
     let cursorCleanup: (() => void) | undefined;
     if (window.matchMedia('(pointer:fine)').matches) {
       const glow = document.querySelector<HTMLElement>('[data-cursor-glow]');
-      const move = (e: PointerEvent) => { if (glow) gsap.to(glow, { x: e.clientX, y: e.clientY, opacity: 1, duration: 0.65, ease: 'power2.out', overwrite: true }); };
+      let glowVisible = false;
+      const moveX = glow ? gsap.quickTo(glow, 'x', { duration: 0.65, ease: 'power2.out' }) : null;
+      const moveY = glow ? gsap.quickTo(glow, 'y', { duration: 0.65, ease: 'power2.out' }) : null;
+      const move = (e: PointerEvent) => {
+        if (!glow || !moveX || !moveY) return;
+        if (!glowVisible) {
+          glowVisible = true;
+          gsap.set(glow, { opacity: 1 });
+        }
+        moveX(e.clientX);
+        moveY(e.clientY);
+      };
       window.addEventListener('pointermove', move, { passive: true });
       document.querySelectorAll<HTMLElement>('.magnetic').forEach(el => {
         const enter = (e: PointerEvent) => { const b = el.getBoundingClientRect(); gsap.to(el, { x: (e.clientX - b.left - b.width / 2) * 0.12, y: (e.clientY - b.top - b.height / 2) * 0.18, duration: 0.35 }); };
@@ -280,11 +310,30 @@ const init = () => {
       cursorCleanup = () => window.removeEventListener('pointermove', move);
     }
 
+    // ── 3D Laptop Asset (Lazy-loaded WebGL after initial idle) ───────
+    let laptopController: LaptopController | null = null;
+    let laptopDisposed = false;
+    const laptopCanvas = document.querySelector<HTMLCanvasElement>('#laptop-canvas');
+    if (laptopCanvas) {
+      const load3D = () => {
+        if (laptopDisposed) return;
+        import('./laptop-3d').then(({ initLaptop3D }) => {
+          if (laptopDisposed) return;
+          laptopController = initLaptop3D(laptopCanvas);
+        }).catch(() => {});
+      };
+      if ('requestIdleCallback' in window) {
+        (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(load3D, { timeout: 1500 });
+      } else {
+        setTimeout(load3D, 200);
+      }
+    }
+
     // ── Reduced motion: tampilkan semua, tanpa animasi/Observer ───────
     if (reduceMotion) {
       document.documentElement.classList.remove('is-fullpage');
       document.querySelectorAll<HTMLElement>('.project-card, .reveal-up, [data-reveal-text]').forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
-      cleanup = () => { menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); ctx.revert(); };
+      cleanup = () => { laptopDisposed = true; menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); laptopController?.destroy(); ctx.revert(); };
       return;
     }
 
@@ -302,7 +351,9 @@ const init = () => {
     if (fullpageRoot) {
       const fullpage = initFullpage(fullpageRoot);
       cleanup = () => {
+        laptopDisposed = true;
         menuCleanup(); galleryCleanup?.(); cursorCleanup?.();
+        laptopController?.destroy();
         fullpage?.destroy();
         ctx.revert();
         splitInstances.forEach(s => s.revert());
@@ -330,7 +381,7 @@ const init = () => {
       });
     }
 
-    cleanup = () => { menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); ctx.revert(); splitInstances.forEach(s => s.revert()); lenis.destroy(); gsap.ticker.remove(raf); };
+    cleanup = () => { laptopDisposed = true; menuCleanup(); galleryCleanup?.(); cursorCleanup?.(); laptopController?.destroy(); ctx.revert(); splitInstances.forEach(s => s.revert()); lenis.destroy(); gsap.ticker.remove(raf); };
   });
 };
 

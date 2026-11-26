@@ -161,7 +161,7 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     overflow: root.style.overflow,
     zIndex: root.style.zIndex,
   };
-  const addedRootClasses = ['fixed', 'left-0', 'right-0', 'bottom-0', 'overflow-hidden', 'z-[1]', 'top-[var(--nav-h)]'];
+  const addedRootClasses = ['fixed', 'left-0', 'right-0', 'bottom-0', 'overflow-hidden', 'z-[2]', 'top-[var(--nav-h)]'];
   const addedPanelClasses = [
     'h-[calc(100dvh-var(--nav-h))]',
     'max-h-[calc(100dvh-var(--nav-h))]',
@@ -203,6 +203,7 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
   const panels = Array.from(track.querySelectorAll<HTMLElement>('[data-fullpage-section]'));
   let current = 0;
   let animating = false;
+  let navigationLockedUntil = 0;
 
   // ── Stepped Hero (state + timeline) ────────────────────────────────
   let heroAnimated = false;
@@ -224,9 +225,16 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
       heroTl = gsap.timeline({
         paused: true,
         defaults: { ease: 'power4.inOut' },
-        onStart: () => { heroBusy = true; },
+        onStart: () => {
+          heroBusy = true;
+          window.dispatchEvent(new CustomEvent('section:change', { detail: { sectionId: 'hero-step2' } }));
+        },
         onComplete: () => { heroAnimated = true; heroBusy = false; },
-        onReverseComplete: () => { heroAnimated = false; heroBusy = false; },
+        onReverseComplete: () => {
+          heroAnimated = false;
+          heroBusy = false;
+          window.dispatchEvent(new CustomEvent('section:change', { detail: { sectionId: 'hero' } }));
+        },
       });
 
       heroTl
@@ -271,11 +279,21 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     if (!immediate && (animating || heroBusy || next === current)) return;
     if (next === heroIndex && current !== heroIndex && heroAnimated) reverseHero(false);
 
+    if (root.scrollTop !== 0) root.scrollTop = 0;
     animating = !immediate;
     current = next;
     reveal(panels[current]);
+    const targetSection = panels[current];
+    if (targetSection) {
+      window.dispatchEvent(
+        new CustomEvent('section:change', {
+          detail: { index: current, sectionId: targetSection.id, immediate },
+        })
+      );
+    }
+    const targetY = targetSection ? -targetSection.offsetTop : -current * step();
     gsap.to(track, {
-      y: -current * step(),
+      y: targetY,
       duration: immediate ? 0 : 0.9,
       ease: 'power4.inOut',
       overwrite: 'auto',
@@ -290,8 +308,6 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
   // section (cegah rambatan vertikal tak sengaja) — slider meng-handle horizontal.
   const allowTarget = (target: EventTarget | null) =>
     !(target as HTMLElement | null)?.closest('input, textarea, select, [contenteditable="true"]');
-  const overGallery = (target: EventTarget | null) =>
-    !!(target as HTMLElement | null)?.closest('[data-drag-gallery]');
 
   const atEdgeForIntent = (el: HTMLElement, intentNext: boolean) => {
     const max = el.scrollHeight - el.clientHeight;
@@ -308,10 +324,10 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
   type IntentSelf = { axis?: string | null; event?: Event | null };
 
   const handleDownIntent = (target: EventTarget | null, self?: IntentSelf) => {
-    if (!allowTarget(target) || animating || heroBusy) return;
+    if (!allowTarget(target) || animating || heroBusy || performance.now() < navigationLockedUntil) return;
     if (self?.axis === 'x') return; // swipe horizontal => bukan navigasi section
-    if (overGallery(target) && self?.event instanceof TouchEvent) return; // cegah rambatan vertikal di atas slider
     if (shouldConsumeInternally(target, true)) return;
+    navigationLockedUntil = performance.now() + 850;
     if (isHero()) {
       if (!heroAnimated) { playHero(); return; }
       goto(current + 1);
@@ -321,10 +337,10 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
   };
 
   const handleUpIntent = (target: EventTarget | null, self?: IntentSelf) => {
-    if (!allowTarget(target) || animating || heroBusy) return;
+    if (!allowTarget(target) || animating || heroBusy || performance.now() < navigationLockedUntil) return;
     if (self?.axis === 'x') return; // swipe horizontal => bukan navigasi section
-    if (overGallery(target) && self?.event instanceof TouchEvent) return; // cegah rambatan vertikal di atas slider
     if (shouldConsumeInternally(target, false)) return;
+    navigationLockedUntil = performance.now() + 850;
     if (isHero()) {
       if (heroAnimated) { reverseHero(false); return; }
       return;
@@ -335,7 +351,7 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
   // preventDefault:true => strict (tanpa scroll bawaan). lockAxis membedakan swipe vertikal/horizontal.
   const observer = Observer.create({
     target: window,
-    type: 'wheel,touch,pointer',
+    type: 'touch,pointer',
     preventDefault: true,
     lockAxis: true,
     wheelSpeed: -1,
@@ -346,6 +362,25 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     onLeft: () => {},
     onRight: () => {},
   });
+
+  let wheelTotal = 0;
+  let wheelReset = 0;
+  const onWheel = (e: WheelEvent) => {
+    if (!allowTarget(e.target) || animating || heroBusy) { e.preventDefault(); return; }
+    if (shouldConsumeInternally(e.target, e.deltaY > 0)) return;
+
+    const now = performance.now();
+    if (now > wheelReset) wheelTotal = 0;
+    wheelReset = now + 180;
+    wheelTotal += e.deltaY;
+    e.preventDefault();
+
+    if (Math.abs(wheelTotal) < 28 || now < navigationLockedUntil) return;
+    const intentNext = wheelTotal > 0;
+    wheelTotal = 0;
+    if (intentNext) handleDownIntent(e.target);
+    else handleUpIntent(e.target);
+  };
 
   const onKey = (e: KeyboardEvent) => {
     if ((e.target as HTMLElement | null)?.closest('input,textarea,select,[contenteditable="true"]')) return;
@@ -376,9 +411,20 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
 
   const onResize = () => gsap.set(track, { y: -current * step() });
 
+  const onFullpageGoto = (e: Event) => {
+    const id = (e as CustomEvent<{ id?: string }>).detail?.id;
+    if (!id) return;
+    const idx = indexForHash(`#${id}`);
+    history.pushState(null, '', `#${id}`);
+    if (idx === heroIndex) reverseHero(true);
+    goto(idx, false);
+  };
+
   window.addEventListener('keydown', onKey);
+  window.addEventListener('wheel', onWheel, { passive: false });
   document.addEventListener('click', onClick);
   window.addEventListener('resize', onResize);
+  window.addEventListener('fullpage:goto', onFullpageGoto);
 
   const start = indexForHash(window.location.hash);
   if (start !== heroIndex) { heroTl?.progress(1); heroAnimated = true; }
@@ -386,14 +432,24 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
   current = start;
   reveal(panels[0]);
   if (current !== 0) reveal(panels[current]);
+  const initialSection = panels[current];
+  if (initialSection) {
+    window.dispatchEvent(
+      new CustomEvent('section:change', {
+        detail: { index: current, sectionId: initialSection.id, immediate: true },
+      })
+    );
+  }
 
   return {
     destroy() {
       observer.kill();
       heroTl?.kill();
       window.removeEventListener('keydown', onKey);
+      window.removeEventListener('wheel', onWheel);
       document.removeEventListener('click', onClick);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('fullpage:goto', onFullpageGoto);
 
       // Pulihkan DOM ke struktur asli (aman untuk Astro transitions).
       try {

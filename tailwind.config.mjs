@@ -4,9 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#07111f', navy: '#0a1728', panel: '#0e2035', line: '#1d3550',
-        electric: '#4d9fff', ice: '#b8dcff', muted: '#8295aa',
-        sun: '#ffc857', coral: '#ff7f6b', mint: '#5ef2c2', lilac: '#b59cff'
+        ink: '#213448', navy: '#213448', panel: '#547792', line: '#94B4C1',
+        electric: '#547792', ice: '#ECEFCA', muted: '#94B4C1'
       },
       fontFamily: {
         display: ['Space Grotesk', 'sans-serif'],
