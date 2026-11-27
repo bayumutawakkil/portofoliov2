@@ -8,7 +8,7 @@ import { Check, Copy } from "lucide-react";
 import {
   Button as ButtonPrimitive,
   type ButtonProps as ButtonPrimitiveProps,
-} from "@/components/unlumen-ui/primitives/button";
+} from "@/components/interactive/unlumen-ui/primitives/button";
 import { cn } from "@/lib/utils";
 import { useControlledState } from "@/hooks/use-controlled-state";
 

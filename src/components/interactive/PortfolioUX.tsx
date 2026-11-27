@@ -1,22 +1,12 @@
 import * as React from "react";
-import {
-  Home,
-  Compass,
-  FolderKanban,
-  Layers,
-  Briefcase,
-  Sparkles,
-  Mail,
-  ArrowUpRight,
-} from "lucide-react";
-import { Dock, type DockItem } from "@/components/unlumen-ui/dock";
-import { GlowButton } from "@/components/unlumen-ui/glow";
-import { MagneticButton } from "@/components/unlumen-ui/magnetic-button";
-import { GlowingBadge } from "@/components/unlumen-ui/glowing-badge";
-import { Tilt } from "@/components/unlumen-ui/tilt";
-import { ScrambleText } from "@/components/unlumen-ui/scramble-text";
-import { ShimmeringText } from "@/components/unlumen-ui/shimmering-text";
-import { ProgressiveBlur } from "@/components/unlumen-ui/progressive-blur";
+import { ArrowUpRight } from "lucide-react";
+import { GlowButton } from "@/components/interactive/unlumen-ui/glow";
+import { MagneticButton } from "@/components/interactive/unlumen-ui/magnetic-button";
+import { GlowingBadge } from "@/components/interactive/unlumen-ui/glowing-badge";
+import { Tilt } from "@/components/interactive/unlumen-ui/tilt";
+import { ShimmeringText } from "@/components/interactive/unlumen-ui/shimmering-text";
+import { ProgressiveBlur } from "@/components/interactive/unlumen-ui/progressive-blur";
+import ScrambleText from "@/components/interactive/unlumen-ui/scramble-text";
 
 export function HeroExploreButton() {
   return (
@@ -41,33 +31,6 @@ export function HeroExploreButton() {
       <span>Explore projects</span>
       <ArrowUpRight className="size-4" aria-hidden="true" />
     </GlowButton>
-  );
-}
-
-export function PortfolioDock() {
-  const items: DockItem[] = React.useMemo(
-    () => [
-      { icon: <Home className="size-4" />, label: "Home", href: "#hero" },
-      { icon: <Compass className="size-4" />, label: "Approach", href: "#about" },
-      { icon: <FolderKanban className="size-4" />, label: "Works", href: "#work" },
-      { icon: <Layers className="size-4" />, label: "Capabilities", href: "#expertise" },
-      { icon: <Briefcase className="size-4" />, label: "Experience", href: "#experience" },
-      { icon: <Sparkles className="size-4" />, label: "Principles", href: "#principles" },
-      { icon: <Mail className="size-4" />, label: "Contact", href: "#contact" },
-    ],
-    [],
-  );
-
-  return (
-    <div className="pointer-events-auto fixed bottom-4 left-1/2 z-40 hidden -translate-x-1/2 lg:block">
-      <Dock
-        items={items}
-        magnification={1.45}
-        distance={100}
-        iconSize={36}
-        className="border border-white/10 bg-[#040b1a]/80 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
-      />
-    </div>
   );
 }
 
@@ -143,24 +106,6 @@ export function ProjectTilt({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ScrambleLabel({
-  text,
-  className,
-}: {
-  text: string;
-  className?: string;
-}) {
-  return (
-    <ScrambleText
-      text={text}
-      scrambleSpeed={32}
-      scrambledLetterCount={3}
-      className={className ?? "font-[var(--mono)] text-[10px] tracking-[0.12em] text-[#c7d8e8]"}
-      scrambledClassName="font-[var(--mono)] text-[10px] tracking-[0.12em] text-[#c7d8e8]/60"
-    />
-  );
-}
-
 export function ShimmerLine({
   text,
   className,
@@ -188,6 +133,38 @@ export function EdgeProgressiveBlur() {
       strength={1.5}
       tint={false}
       className="pointer-events-none fixed inset-x-0 top-[var(--nav-h)] z-[5]"
+    />
+  );
+}
+
+export function ScrambleLabel({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
+  const [reducedMotion, setReducedMotion] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setReducedMotion(
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      );
+    }
+  }, []);
+
+  if (reducedMotion) {
+    return <span className={className}>{text}</span>;
+  }
+
+  return (
+    <ScrambleText
+      text={text}
+      scrambleSpeed={35}
+      scrambledLetterCount={3}
+      autoStart={true}
+      className={className}
     />
   );
 }

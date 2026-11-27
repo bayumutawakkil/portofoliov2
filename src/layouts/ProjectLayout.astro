@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
 import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
 import Nav from '../components/Nav.astro';
 import ProjectVisual from '../components/ProjectVisual.astro';
@@ -16,27 +17,46 @@ const { project } = Astro.props;
 const { Content } = await render(project);
 const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const index = all.findIndex((p) => p.id === project.id);
-const next = all[(index + 1) % all.length];
+const prev = all.length > 1 ? all[(index - 1 + all.length) % all.length] : undefined;
+const next = all.length > 1 ? all[(index + 1) % all.length] : undefined;
 
 const caseStudySections = [
   { label: 'Role', value: project.data.role },
   { label: 'Problem', value: project.data.problem },
   { label: 'Decision', value: project.data.decision },
   { label: 'Outcome', value: project.data.outcome },
-].filter((sec): sec is { label: string; value: string } => Boolean(sec.value));
+].filter((sec): sec is { label: string; value: string } => Boolean(sec.value?.trim()));
+
+const coverAlt = project.data.coverAlt ?? `${project.data.category} — ${project.data.title}`;
+const hasRepo = Boolean(project.data.repoUrl?.trim());
+const hasDemo = Boolean(project.data.demoUrl?.trim());
 ---
-<BaseLayout title={`${project.data.title} — Bayu Mutawakkil`} description={project.data.summary}>
+<BaseLayout
+  title={`${project.data.title} — Bayu Mutawakkil`}
+  description={project.data.summary}
+  ogImage={project.data.cover?.src}
+  ogImageAlt={coverAlt}
+>
   <Nav />
   <main class="project-detail section-pad">
     <div class="detail-shell">
       <a class="detail-back" href="/projects"><ArrowLeft size={14} aria-hidden="true" /> Back to works</a>
       <div class={`detail-visual project-${project.data.accent}`}>
-        <ProjectVisual
-          slug={project.id}
-          title={project.data.title}
-          category={project.data.category}
-          accent={project.data.accent}
-        />
+        {project.data.cover ? (
+          <Image
+            src={project.data.cover}
+            alt={coverAlt}
+            class="detail-cover-img"
+            loading="eager"
+          />
+        ) : (
+          <ProjectVisual
+            slug={project.id}
+            title={project.data.title}
+            category={project.data.category}
+            accent={project.data.accent}
+          />
+        )}
         <span>{project.data.category}</span>
         <small>{project.data.year} / {project.data.status}</small>
       </div>
@@ -47,11 +67,23 @@ const caseStudySections = [
         {project.data.stack.length > 0 && (
           <div class="detail-tags">
             {project.data.stack.map((tag) => (
-              <Badge variant="outline" className="rounded-md border-white/15 bg-white/[0.03] px-2.5 py-1 font-[var(--mono)] text-[10px] text-[#c1d5e8]">{tag}</Badge>
+              <Badge variant="outline" className="rounded-md border-white/15 bg-white/[0.03] px-2.5 py-1 font-[var(--mono)] text-[11px] text-[#c1d5e8]">{tag}</Badge>
             ))}
           </div>
         )}
         <Separator className="my-8 bg-white/10" />
+
+        {project.data.metrics && project.data.metrics.length > 0 && (
+          <section class="detail-metrics" aria-label="Project metrics">
+            {project.data.metrics.map((m) => (
+              <div class="detail-metric-card">
+                <span class="detail-metric-label">{m.label}</span>
+                <strong class="detail-metric-value">{m.value}</strong>
+              </div>
+            ))}
+          </section>
+        )}
+
         <div class="detail-prose" lang="id"><Content /></div>
 
         {caseStudySections.length > 0 && (
@@ -65,17 +97,73 @@ const caseStudySections = [
           </section>
         )}
 
-        <div class="mt-8">
-          <a class={`${buttonVariants({ variant: 'default', size: 'lg' })} h-[50px] gap-8 rounded-md px-[17px] text-[11px] font-bold`} href={project.data.externalUrl} target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={16} aria-hidden="true" /></a>
-        </div>
+        {project.data.gallery && project.data.gallery.length > 0 && (
+          <section class="detail-gallery" aria-label="Project gallery">
+            <h2 class="detail-section-title">Gallery</h2>
+            <div class="detail-gallery-grid">
+              {project.data.gallery.map((item) => (
+                <figure class="detail-gallery-item">
+                  <Image src={item.src} alt={item.alt} loading="lazy" class="h-auto w-full rounded-lg object-cover" />
+                  {item.caption && <figcaption>{item.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {(hasRepo || hasDemo) && (
+          <div class="mt-8 flex flex-wrap gap-4">
+            {hasRepo && (
+              <a
+                class={`${buttonVariants({ variant: 'default', size: 'lg' })} h-[50px] gap-8 rounded-md px-[17px] text-[11px] font-bold`}
+                href={project.data.repoUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`Open ${project.data.title} repository (buka di tab baru)`}
+              >
+                Open repository <ArrowUpRight size={16} aria-hidden="true" />
+              </a>
+            )}
+            {hasDemo && (
+              <a
+                class={`${buttonVariants({ variant: 'outline', size: 'lg' })} h-[50px] gap-8 rounded-md px-[17px] text-[11px] font-bold`}
+                href={project.data.demoUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`Open ${project.data.title} live demo (buka di tab baru)`}
+              >
+                Live demo <ArrowUpRight size={16} aria-hidden="true" />
+              </a>
+            )}
+          </div>
+        )}
       </article>
-      {next && next.id !== project.id && (
-        <nav class="detail-next" aria-label="Next project">
-          <a href={`/projects/${next.id}`}>
-            <span>NEXT CASE STUDY</span>
-            <strong>{next.data.title}</strong>
-            <ArrowUpRight size={18} aria-hidden="true" />
-          </a>
+      {(prev || next) && (
+        <nav class="detail-next-nav" aria-label="Project navigation">
+          {prev && (
+            <a
+              class="detail-nav-link detail-nav-prev rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4d9fff]"
+              href={`/projects/${prev.id}`}
+            >
+              <span class="detail-nav-label">PREVIOUS CASE STUDY</span>
+              <span class="detail-nav-row">
+                <ArrowLeft size={18} aria-hidden="true" />
+                <strong>{prev.data.title}</strong>
+              </span>
+            </a>
+          )}
+          {next && (
+            <a
+              class="detail-nav-link detail-nav-next rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4d9fff]"
+              href={`/projects/${next.id}`}
+            >
+              <span class="detail-nav-label">NEXT CASE STUDY</span>
+              <span class="detail-nav-row">
+                <strong>{next.data.title}</strong>
+                <ArrowUpRight size={18} aria-hidden="true" />
+              </span>
+            </a>
+          )}
         </nav>
       )}
     </div>

@@ -1,0 +1,54 @@
+/* ── Design tokens ──────────────────────────────────────────────
+   Single source of truth for palette, fonts, radii, and interaction
+   accents. Imported at the top of global.css.
+
+   Cascade order is preserved from the original stylesheet:
+   1. Base tokens (shadcn + layout)
+   2. Luminous Cyber palette overrides
+   3. Focus ring */
+
+:root {
+  --radius: 0.625rem;
+  --background: #040b1a;
+  --foreground: #e9f2fc;
+  --card: rgba(255, 255, 255, 0.04);
+  --card-foreground: #e9f2fc;
+  --popover: #091827;
+  --popover-foreground: #e9f2fc;
+  --primary: #4d9fff;
+  --primary-foreground: #061321;
+  --secondary: rgba(255, 255, 255, 0.08);
+  --secondary-foreground: #e9f2fc;
+  --muted: #94B4C1;
+  --muted-foreground: #8fa3b8;
+  --accent: rgba(77, 159, 255, 0.14);
+  --accent-foreground: #e9f2fc;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: #4d9fff;
+  --bg: #213448;
+  --panel: #547792;
+  --line: rgba(148, 180, 193, 0.22);
+  --blue: #547792;
+  --cyan: #94B4C1;
+  --display: 'Space Grotesk', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
+  color: #ECEFCA;
+  background: #213448;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Luminous Cyber Blue ─────────────────────────────────────────
+   Palette + interaction polish. Tilt-free: hover uses glow and a small
+   lift (the `translate` property composes with GSAP's `transform`). */
+:root {
+  --bg: #213448; --surface: rgba(84, 119, 146, .42); --border: rgba(148, 180, 193, .28);
+  --blue-primary: #547792; --blue: #547792; --sky: #94B4C1; --cyan: #94B4C1; --cyan-bright: #ECEFCA; --indigo: #547792;
+  --ice-text: #ECEFCA; --ice-muted: #94B4C1; --muted: #94B4C1;
+}
+
+:root { --focus-ring: #ECEFCA; }

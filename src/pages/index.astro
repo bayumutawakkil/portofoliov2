@@ -12,7 +12,8 @@ import {
   ProjectTilt,
   ShimmerLine,
   EdgeProgressiveBlur,
-} from '../components/PortfolioUX';
+  ScrambleLabel,
+} from '../components/interactive/PortfolioUX';
 import { profile, capabilities, experience } from '../data/site';
 import { getOrderedProjects } from '../data/project-gallery';
 
@@ -39,7 +40,7 @@ const personJsonLd = {
     <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
     <Nav />
     <!-- 3D Laptop Canvas Container (cross-section interactive 3D model, positioned behind content) -->
-    <div id="laptop-scene-container" class="pointer-events-none fixed inset-0 z-[1] overflow-hidden opacity-85 transition-opacity duration-700" aria-hidden="true">
+    <div id="laptop-scene-container" class="pointer-events-none fixed inset-0 z-[1] overflow-hidden opacity-85 transition-opacity duration-700 max-lg:hidden" aria-hidden="true">
       <canvas id="laptop-canvas" class="h-full w-full block pointer-events-none"></canvas>
     </div>
     <main data-fullpage class="relative z-[2]">
@@ -99,7 +100,7 @@ const personJsonLd = {
             <a class="text-link max-lg:hidden" href="#about">More about me <span>↓</span></a>
           </div>
         </div>
-        <div class="hero-index relative z-[4] shrink-0 max-lg:text-[10px] max-lg:hidden" data-hero-meta><span>01 / 06</span><span class="hero-index-line"></span><span>SCROLL</span><span class="scroll-cue">↓</span></div>
+        <div class="hero-index relative z-[4] shrink-0 max-lg:text-[11px] max-lg:hidden" data-hero-meta><span>01 / 07</span><span class="hero-index-line"></span><span>SCROLL</span><span class="scroll-cue">↓</span></div>
       </section>
 
       <section class="manifesto section-pad flex h-auto min-h-[100svh] flex-col overflow-visible lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden" id="about">
@@ -109,9 +110,10 @@ const personJsonLd = {
 
       <!-- Desktop: strict 100dvh dengan fullpage/Observer. Mobile: fluid, stacked, native scroll. -->
       <section
-        class="work-section section-pad relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden [will-change:transform]"
+        class="work-section section-pad relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 [will-change:transform]"
         id="work"
         aria-labelledby="work-title"
+        data-fullpage-scroll
       >
         <!-- Section label stays at the top-left, matching the other section headers. -->
         <div class="work-label pointer-events-none absolute left-[clamp(24px,7.1vw,112px)] z-[51]">
@@ -120,7 +122,7 @@ const personJsonLd = {
 
         <!-- On desktop, the title is anchored to the left and centered vertically above the slider. -->
         <div class="pointer-events-none relative z-[60] shrink-0 pt-2 text-left lg:absolute lg:left-[clamp(24px,7.1vw,112px)] lg:top-1/2 lg:-translate-y-1/2 lg:pt-0">
-          <h2 id="work-title" class="m-0 mt-1 font-[var(--display)] text-[clamp(2rem,9vw,3.25rem)] font-semibold leading-[0.86] tracking-[-0.06em] text-white [text-shadow:0_8px_28px_rgba(0,0,0,0.55),0_2px_8px_rgba(77,159,255,0.18)] lg:mt-2 lg:text-[clamp(56px,11vw,180px)] lg:leading-[0.82] lg:tracking-[-0.07em] lg:text-white">Works</h2>
+          <h2 id="work-title" class="m-0 mt-1 font-[var(--display)] text-[clamp(3.25rem,16vw,4.75rem)] font-semibold leading-[0.86] tracking-[-0.06em] text-white [text-shadow:0_8px_28px_rgba(0,0,0,0.55),0_2px_8px_rgba(77,159,255,0.18)] lg:mt-2 lg:text-[clamp(56px,11vw,180px)] lg:leading-[0.82] lg:tracking-[-0.07em] lg:text-white"><ScrambleLabel client:visible text="Works" /></h2>
         </div>
 
         <!-- Slider: flex-1 + min-h-0 agar muat 100dvh; swipe horizontal untuk geser proyek -->
@@ -152,8 +154,8 @@ const personJsonLd = {
               );
             })}
           </div>
-          <Button variant="outline" size="icon" className="works-nav works-nav-prev rounded-full border-white/15 bg-white/[0.04] text-foreground hover:bg-white/10" type="button" data-gallery-prev aria-label="Previous project">←</Button>
-          <Button variant="outline" size="icon" className="works-nav works-nav-next rounded-full border-white/15 bg-white/[0.04] text-foreground hover:bg-white/10" type="button" data-gallery-next aria-label="Next project">→</Button>
+          <Button variant="outline" size="icon" className="works-nav works-nav-prev rounded-full border-white/15 bg-white/[0.04] text-foreground hover:bg-white/10 max-lg:hidden" type="button" data-gallery-prev aria-label="Previous project">←</Button>
+          <Button variant="outline" size="icon" className="works-nav works-nav-next rounded-full border-white/15 bg-white/[0.04] text-foreground hover:bg-white/10 max-lg:hidden" type="button" data-gallery-next aria-label="Next project">→</Button>
         </div>
 
         <div class="work-foot z-[6] shrink-0 pt-[clamp(6px,1.2vh,14px)]"><span>2023 — 2026</span><a href="/projects">VIEW ALL WORKS <span>↗</span></a></div>
@@ -163,7 +165,8 @@ const personJsonLd = {
       <section
         id="expertise"
         aria-labelledby="expertise-title"
-        class="relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col overflow-hidden px-[clamp(16px,4.5vw,72px)] py-12 max-lg:py-16 lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:py-[clamp(8px,1.6vh,18px)] lg:overflow-hidden"
+        data-fullpage-scroll
+        class="relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col overflow-hidden px-[clamp(16px,4.5vw,72px)] py-12 max-lg:py-16 lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:py-[clamp(8px,1.6vh,18px)]"
       >
         <div class="mx-auto flex h-auto max-h-full min-h-0 w-full max-w-[1060px] flex-col gap-6 max-lg:gap-8 lg:my-auto lg:flex-row lg:items-center lg:gap-10">
           <!-- Judul: mobile horizontal/atas (tengah, full width); desktop vertikal di kiri -->
@@ -172,8 +175,8 @@ const personJsonLd = {
               <span class="section-number [writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180">03 — CAPABILITIES</span>
               <h2
                 id="expertise-title"
-                class="m-0 font-[var(--display)] text-[clamp(2.2rem,8vw,3.2rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-[#e9f2fc] [writing-mode:horizontal-tb] lg:rotate-180 lg:text-[clamp(2.2rem,7vh,5rem)] lg:leading-[0.86] lg:tracking-[-0.06em] lg:[writing-mode:vertical-rl]"
-              >WHAT I BRING</h2>
+                class="m-0 font-[var(--display)] text-[clamp(2.75rem,12vw,4.25rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-[#e9f2fc] [writing-mode:horizontal-tb] lg:rotate-180 lg:text-[clamp(2.2rem,7vh,5rem)] lg:leading-[0.86] lg:tracking-[-0.06em] lg:[writing-mode:vertical-rl]"
+              ><ScrambleLabel client:visible text="WHAT I BRING" /></h2>
             </div>
           </div>
 
@@ -199,7 +202,7 @@ const personJsonLd = {
                 <div class="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#4d9fff]/0 blur-2xl transition-all duration-300 group-hover:bg-[#4d9fff]/15"></div>
 
                 <div class="relative z-[1] flex shrink-0 items-start justify-between gap-1">
-                  <Badge variant="outline" className="cap-id rounded-md border-[#4d9fff]/30 bg-[#4d9fff]/10 font-[var(--mono)] text-[10px] tracking-[0.14em] text-[#7ec0ff]">{item.id}</Badge>
+                  <Badge variant="outline" className="cap-id rounded-md border-[#4d9fff]/30 bg-[#4d9fff]/10 font-[var(--mono)] text-[10px] max-lg:text-[11px] tracking-[0.14em] text-[#7ec0ff]">{item.id}</Badge>
                   <span class="text-white/50 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#82d8ed]">↗</span>
                 </div>
 
@@ -208,7 +211,7 @@ const personJsonLd = {
                   <p class="m-0 mt-2.5 text-[14px] leading-[1.65] text-[#c7d9ea] max-lg:line-clamp-none lg:mt-[clamp(3px,0.6vh,8px)] lg:text-[14px] lg:leading-[1.45] lg:[display:-webkit-box] lg:[-webkit-box-orient:vertical] lg:[-webkit-line-clamp:2] lg:overflow-hidden">{item.desc}</p>
                 </div>
 
-                <div class="relative z-[1] mt-5 shrink-0 pt-2 font-[var(--mono)] text-[10px] uppercase tracking-wider text-[#b3c9de] max-lg:line-clamp-none lg:mt-auto lg:pt-[clamp(4px,0.8vh,10px)] lg:text-[10px] lg:[display:-webkit-box] lg:[-webkit-box-orient:vertical] lg:[-webkit-line-clamp:1] lg:overflow-hidden">{item.tags}</div>
+                <div class="relative z-[1] mt-5 shrink-0 pt-2 font-[var(--mono)] text-[10px] max-lg:text-[11px] uppercase tracking-wider text-[#b3c9de] max-lg:line-clamp-none lg:mt-auto lg:pt-[clamp(4px,0.8vh,10px)] lg:text-[10px] lg:[display:-webkit-box] lg:[-webkit-box-orient:vertical] lg:[-webkit-line-clamp:1] lg:overflow-hidden">{item.tags}</div>
               </article>
             ))}
           </div>
@@ -217,23 +220,30 @@ const personJsonLd = {
 
       <!-- 04 — EXPERIENCE: Desktop accordion (first card open by default, hover/focus/tap); Mobile tappable cards -->
       <section
-        class="experience section-pad relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0 lg:overflow-hidden"
+        class="experience section-pad relative flex h-auto min-h-screen max-lg:min-h-screen max-lg:h-auto max-lg:overflow-visible flex-col lg:h-[calc(100dvh-var(--nav-h))] lg:max-h-[calc(100dvh-var(--nav-h))] lg:min-h-0"
         id="experience"
         aria-labelledby="experience-title"
+        data-fullpage-scroll
       >
         <!-- Header -->
         <div class="shrink-0">
           <SectionHeading number="04 — EXPERIENCE" aside="LEARNING IN PUBLIC" />
           <h2
             id="experience-title"
-            class="m-0 mt-[clamp(6px,1.2vh,14px)] font-[var(--display)] text-[clamp(1.8rem,6vw,3.6rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-[#e9f2fc]"
+            class="m-0 mt-[clamp(6px,1.2vh,14px)] font-[var(--display)] text-[clamp(2.6rem,11vw,3.8rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-[#e9f2fc] lg:text-[clamp(1.8rem,6vw,3.6rem)]"
           >
             Learning through<br /><span class="text-[#8ba7c4]">real systems.</span>
           </h2>
         </div>
 
         <!-- Desktop: horizontal accordion (first card active by default); Mobile: tappable vertical cards -->
-        <div class="exp-accordion mt-[clamp(12px,2vh,24px)] flex w-full min-h-0 flex-1 flex-col gap-4 max-lg:gap-5 lg:mb-6 lg:max-h-[clamp(300px,46vh,420px)] lg:flex-row lg:gap-0 lg:overflow-hidden lg:rounded-2xl lg:border lg:border-white/[0.06] lg:bg-white/[0.015]" data-exp-accordion>
+        <div class="relative flex min-h-0 flex-1 flex-col">
+          <div
+            data-exp-timeline
+            aria-hidden="true"
+            class="pointer-events-none absolute left-1/2 top-0 bottom-0 z-0 hidden w-px -translate-x-1/2 origin-top bg-gradient-to-b from-[#4d9fff]/60 via-[#82d8ed]/40 to-transparent lg:block"
+          ></div>
+          <div class="exp-accordion relative z-[1] mt-[clamp(12px,2vh,24px)] flex w-full min-h-0 flex-1 flex-col gap-4 max-lg:gap-5 lg:mb-6 lg:max-h-[clamp(300px,46vh,420px)] lg:flex-row lg:gap-0 lg:overflow-hidden lg:rounded-2xl lg:border lg:border-white/[0.06] lg:bg-white/[0.015]" data-exp-accordion>
           {experience.map((item, i) => (
             <article
               class:list={[
@@ -246,7 +256,6 @@ const personJsonLd = {
               data-exp-card
               data-exp-index={i}
               tabindex="0"
-              aria-expanded={i === 0 ? 'true' : 'false'}
               aria-label={`${item.period} — ${item.title}`}
             >
               <div class="exp-card-top-line pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4d9fff]/0 to-transparent transition-all duration-700"></div>
@@ -257,7 +266,7 @@ const personJsonLd = {
                   <div class="flex min-w-0 flex-col gap-1.5">
                     <span class="font-[var(--mono)] text-[11px] font-medium tracking-[0.14em] text-[#7ec0ff]">{item.period}</span>
                     <h3 class="m-0 font-[var(--display)] text-[1.2rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white">{item.title}</h3>
-                    <p class="m-0 font-[var(--mono)] text-[10px] uppercase tracking-[0.12em] text-[#9de3f5]">{item.organization}</p>
+                    <p class="m-0 font-[var(--mono)] text-[11px] uppercase tracking-[0.12em] text-[#9de3f5]">{item.organization}</p>
                   </div>
                   <div class="flex shrink-0 items-center gap-2.5 pt-0.5">
                     <span class="font-[var(--mono)] text-[11px] font-medium text-[#b5c8dc]">0{i + 1}</span>
@@ -301,6 +310,7 @@ const personJsonLd = {
               </div>
             </article>
           ))}
+          </div>
         </div>
       </section>
 
@@ -354,19 +364,19 @@ const personJsonLd = {
         cards.forEach((card) => {
           const active = card === target;
           card.classList.toggle('is-active', active);
-          card.setAttribute('aria-expanded', String(active));
         });
       };
       cards.forEach((card) => {
         card.addEventListener('pointerenter', () => {
           if (window.matchMedia('(min-width: 1024px)').matches) activate(card);
         });
-        card.addEventListener('focusin', () => activate(card));
+        card.addEventListener('focusin', () => {
+          if (window.matchMedia('(min-width: 1024px)').matches) activate(card);
+        });
         card.addEventListener('click', () => {
           const isAlready = card.classList.contains('is-active');
           if (window.matchMedia('(max-width: 1023px)').matches) {
             card.classList.toggle('is-active', !isAlready);
-            card.setAttribute('aria-expanded', String(!isAlready));
           } else {
             activate(card);
           }

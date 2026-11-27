@@ -3,8 +3,8 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { ClippedCircle } from "@/components/unlumen-ui/clipped-circle";
-import { Tilt, type TiltProps } from "@/components/unlumen-ui/tilt";
+import { ClippedCircle } from "@/components/interactive/unlumen-ui/clipped-circle";
+import { Tilt, type TiltProps } from "@/components/interactive/unlumen-ui/tilt";
 
 export interface TiltCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;

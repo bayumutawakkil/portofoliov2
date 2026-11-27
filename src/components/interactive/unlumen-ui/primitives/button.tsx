@@ -1,9 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { motion, type HTMLMotionProps } from "motion/react";
 
-import { Slot, type WithAsChild } from "@/components/unlumen-ui/primitives/slot";
+import { Slot, type WithAsChild } from "@/components/interactive/unlumen-ui/primitives/slot";
 
 type ButtonProps = WithAsChild<
   HTMLMotionProps<"button"> & {

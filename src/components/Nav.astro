@@ -1,16 +1,20 @@
 ---
+import { navigation } from '../data/navigation';
+
 const isHome = Astro.url.pathname === '/';
-const anchor = (id: string) => isHome ? `#${id}` : `/#${id}`;
+/** Route items keep their absolute href; section items become anchors. */
+const resolveHref = (item: (typeof navigation)[number]) =>
+  item.href ?? (isHome ? `#${item.id}` : `/#${item.id}`);
 ---
 <header class="site-header" data-header>
   <a class="brand" href={isHome ? '#top' : '/'} aria-label="Bayu Mutawakkil home"><span class="brand-mark">B<span>.</span></span><span class="brand-name">BAYU MUTAWAKKIL</span></a>
   <nav class="desktop-nav" aria-label="Main navigation">
-    <a href={anchor('about')}>About Me</a><a href="/projects">Works</a><a href={anchor('expertise')}>Expertise</a><a href={anchor('experience')}>Experience</a><a href={anchor('principles')}>Manifesto</a><a href={anchor('contact')}>Contact</a>
+    {navigation.map((item) => <a href={resolveHref(item)}>{item.label}</a>)}
   </nav>
-  <a class="header-availability" href={anchor('contact')}><span class="status-dot"></span> Available for opportunities</a>
+  <a class="header-availability" href={isHome ? '#contact' : '/#contact'}><span class="status-dot"></span> Available for opportunities</a>
   <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><span></span><span></span></button>
 </header>
 <div class="mobile-menu" id="site-menu" aria-label="Mobile navigation" data-mobile-menu>
-  <a href={anchor('about')}>About Me <span>01</span></a><a href="/projects">Works <span>02</span></a><a href={anchor('expertise')}>Expertise <span>03</span></a><a href={anchor('experience')}>Experience <span>04</span></a><a href={anchor('principles')}>Manifesto <span>05</span></a><a href={anchor('contact')}>Contact <span>06</span></a>
+  {navigation.map((item) => <a href={resolveHref(item)}>{item.label} <span>{item.index}</span></a>)}
   <p>INFORMATION SYSTEMS × SOFTWARE ENGINEERING</p>
 </div>

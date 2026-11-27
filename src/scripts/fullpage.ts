@@ -16,6 +16,24 @@ export type FullpageController = { destroy: () => void } | undefined;
  * - Reduced-motion: Observer nonaktif.
  * - Animasi GSAP hanya properti kompositor (x/y/opacity/scale/percent).
  */
+const enterOnScroll = (
+  targets: Element | Element[] | NodeListOf<Element>,
+  trigger: Element | string,
+  opts: gsap.TweenVars = {}
+) =>
+  gsap.fromTo(
+    targets,
+    { y: 32, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 0.75,
+      ease: 'power2.out',
+      scrollTrigger: { trigger, start: 'top 92%', once: true },
+      ...opts,
+    }
+  );
+
 export function initFullpage(root: HTMLElement): FullpageController {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion) return;
@@ -24,117 +42,67 @@ export function initFullpage(root: HTMLElement): FullpageController {
   const mm = gsap.matchMedia();
   
   mm.add('(min-width: 1024px)', () => {
+    const expTimeline = document.querySelector<HTMLElement>('#experience [data-exp-timeline]');
+    if (expTimeline) {
+      gsap.fromTo(
+        expTimeline,
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '#experience',
+            start: 'top 80%',
+            end: 'bottom 20%',
+            scrub: true,
+          },
+        }
+      );
+    }
+
     const ctrl = initFullpageDesktop(root);
     return () => ctrl?.destroy();
   });
 
   // Mobile (< 1024px): ScrollTrigger Entrance Animation (Fade-up on Scroll)
   mm.add('(max-width: 1023px)', () => {
-    // 1. Judul Section & Manifesto
-    const sectionHeadings = document.querySelectorAll<HTMLElement>(
-      '#about .section-heading, #about .manifesto-title, #about .manifesto-copy, #principles .section-heading, #principles .principles-title, #principles .principle-list, #contact .section-heading, #contact .contact-content, #work .work-intro, #work .work-foot, #expertise h2, #experience h2'
-    );
-    sectionHeadings.forEach((el) => {
-      el.style.willChange = 'transform, opacity';
+    // 0. Hero sudah berada di viewport: reveal langsung, tanpa trigger.
+    const heroReveal = document.querySelectorAll<HTMLElement>('#hero .reveal-up');
+    if (heroReveal.length) {
       gsap.fromTo(
-        el,
-        { y: 40, opacity: 0, immediateRender: false },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            once: true,
-          },
-        }
+        heroReveal,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1, delay: 0.2 }
       );
-      gsap.set(el, { y: 0, opacity: 1 });
-    });
+    }
 
-    // 2. Project Slider
+    // 1. Judul Section & Manifesto
+    document
+      .querySelectorAll<HTMLElement>(
+        '#about .section-heading, #about .manifesto-title, #about .manifesto-copy, #principles .section-heading, #principles .principles-title, #principles .principle-list, #contact .section-heading, #contact .contact-content, #work .work-intro, #work .work-foot, #expertise h2, #experience h2'
+      )
+      .forEach((el) => enterOnScroll(el, el));
+
+    // 2. Project slider
     const workStage = document.querySelector<HTMLElement>('#work .works-stage');
     if (workStage) {
-      workStage.style.willChange = 'transform, opacity';
-      gsap.fromTo(
-        workStage,
-        { y: 40, opacity: 0, immediateRender: false },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: workStage,
-            start: 'top 85%',
-            once: true,
-          },
-        }
-      );
-      gsap.set(workStage, { y: 0, opacity: 1 });
-
-      // Kartu slider ikut fade-in bersama stage saat section #work masuk viewport.
-      document.querySelectorAll<HTMLElement>('#work .project-list [data-gallery-card]').forEach((card) => {
-        card.style.willChange = 'transform, opacity';
-        gsap.fromTo(
-          card,
-          { y: 40, opacity: 0, immediateRender: false },
-          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: workStage, start: 'top 85%', once: true } }
-        );
-        gsap.set(card, { y: 0, opacity: 1 });
-      });
+      enterOnScroll(workStage, workStage);
+      const cards = document.querySelectorAll<HTMLElement>('#work .project-list [data-gallery-card]');
+      if (cards.length) enterOnScroll(cards, workStage, { ease: 'power3.out' });
     }
 
-    // 3. Bento Grid Cards (#expertise) dengan stagger: 0.15
-    const bentoCards = document.querySelectorAll<HTMLElement>('#expertise article');
-    if (bentoCards.length > 0) {
-      bentoCards.forEach((c) => { c.style.willChange = 'transform, opacity'; });
-      gsap.fromTo(
-        bentoCards,
-        { y: 40, opacity: 0, immediateRender: false },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-          stagger: 0.15,
-          scrollTrigger: {
-            trigger: '#expertise',
-            start: 'top 85%',
-            once: true,
-          },
-        }
-      );
-      bentoCards.forEach((c) => gsap.set(c, { y: 0, opacity: 1 }));
+    // 3. Bento cards
+    const bento = document.querySelectorAll<HTMLElement>('#expertise article');
+    if (bento.length) {
+      bento.forEach((card, i) => enterOnScroll(card, card, { delay: i * 0.06 }));
     }
 
-    // 4. Experience Rows (#experience) dengan stagger: 0.15
+    // 4. Experience rows
     const expRows = document.querySelectorAll<HTMLElement>('#experience article');
-    if (expRows.length > 0) {
-      expRows.forEach((r) => { r.style.willChange = 'transform, opacity'; });
-      gsap.fromTo(
-        expRows,
-        { y: 40, opacity: 0, immediateRender: false },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-          stagger: 0.15,
-          scrollTrigger: {
-            trigger: '#experience',
-            start: 'top 85%',
-            once: true,
-          },
-        }
-      );
-      expRows.forEach((r) => gsap.set(r, { y: 0, opacity: 1 }));
+    if (expRows.length) {
+      expRows.forEach((card, i) => enterOnScroll(card, card, { delay: i * 0.06 }));
     }
 
-    // Pastikan ScrollTrigger ter-registrasi & di-refresh setelah animasi dibuat
-    // (mencegah entrance animation stuck di dari-state sehingga konten terlihat disembunyikan).
     ScrollTrigger.refresh();
   });
 
@@ -147,7 +115,6 @@ export function initFullpage(root: HTMLElement): FullpageController {
 
 function initFullpageDesktop(root: HTMLElement): FullpageController {
 
-  const footer = document.querySelector<HTMLElement>('footer.footer-wrap');
   const panelSources = Array.from(root.querySelectorAll<HTMLElement>(':scope > section'));
   if (panelSources.length < 2) return;
 
@@ -161,7 +128,7 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     overflow: root.style.overflow,
     zIndex: root.style.zIndex,
   };
-  const addedRootClasses = ['fixed', 'left-0', 'right-0', 'bottom-0', 'overflow-hidden', 'z-[2]', 'top-[var(--nav-h)]'];
+  const addedRootClasses = ['fixed', 'left-0', 'right-0', 'bottom-0', 'overflow-clip', 'z-[2]', 'top-[var(--nav-h)]'];
   const addedPanelClasses = [
     'h-[calc(100dvh-var(--nav-h))]',
     'max-h-[calc(100dvh-var(--nav-h))]',
@@ -169,11 +136,10 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     'flex-col',
     'will-change-transform',
     'overflow-y-auto',
-    'overflow-hidden',
+    'overflow-clip',
     'overflow-x-clip',
     'overscroll-y-contain',
   ];
-  const footerPrev = footer ? { parent: footer.parentNode, next: footer.nextSibling } : null;
 
   document.documentElement.classList.add('is-fullpage');
 
@@ -191,14 +157,13 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     const scrollable = el.hasAttribute('data-fullpage-scroll');
     el.dataset.fullpageSection = '';
     el.classList.add('h-[calc(100dvh-var(--nav-h))]', 'max-h-[calc(100dvh-var(--nav-h))]', 'flex', 'flex-col', 'will-change-transform');
-    el.classList.add(scrollable ? 'overflow-y-auto' : 'overflow-hidden');
+    el.classList.add(scrollable ? 'overflow-y-auto' : 'overflow-clip');
     if (scrollable) el.classList.add('overflow-x-clip', 'overscroll-y-contain');
     el.style.minHeight = '0';
     track.appendChild(el);
   };
 
   panelSources.forEach(attachPanel);
-  if (footer && !track.contains(footer)) attachPanel(footer);
 
   const panels = Array.from(track.querySelectorAll<HTMLElement>('[data-fullpage-section]'));
   let current = 0;
@@ -375,7 +340,8 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     wheelTotal += e.deltaY;
     e.preventDefault();
 
-    if (Math.abs(wheelTotal) < 28 || now < navigationLockedUntil) return;
+    if (now < navigationLockedUntil) { wheelTotal = 0; return; } // buang sisa inersia selama lock
+    if (Math.abs(wheelTotal) < 36) return;                       // sedikit lebih tinggi untuk trackpad
     const intentNext = wheelTotal > 0;
     wheelTotal = 0;
     if (intentNext) handleDownIntent(e.target);
@@ -383,7 +349,8 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
   };
 
   const onKey = (e: KeyboardEvent) => {
-    if ((e.target as HTMLElement | null)?.closest('input,textarea,select,[contenteditable="true"]')) return;
+    // Biarkan button dan tautan memproses Space/Enter secara native.
+    if ((e.target as HTMLElement | null)?.closest('input,textarea,select,[contenteditable="true"],button,a[href]')) return;
     if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); handleDownIntent(e.target); }
     if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); handleUpIntent(e.target); }
     if (e.key === 'Home') { e.preventDefault(); reverseHero(true); goto(0); }
@@ -420,6 +387,12 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
     goto(idx, false);
   };
 
+  const onFocusIn = (e: FocusEvent) => {
+    const idx = panels.findIndex((p) => p.contains(e.target as Node));
+    if (idx >= 0 && idx !== current) goto(idx, true); // koreksi cepat tanpa animasi
+  };
+  root.addEventListener('focusin', onFocusIn);
+
   window.addEventListener('keydown', onKey);
   window.addEventListener('wheel', onWheel, { passive: false });
   document.addEventListener('click', onClick);
@@ -443,6 +416,7 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
 
   return {
     destroy() {
+      root.removeEventListener('focusin', onFocusIn);
       observer.kill();
       heroTl?.kill();
       window.removeEventListener('keydown', onKey);
@@ -459,12 +433,6 @@ function initFullpageDesktop(root: HTMLElement): FullpageController {
           el.style.minHeight = '';
           root.appendChild(el);
         });
-        if (footer && footerPrev) {
-          if (footerPrev.parent) {
-            if (footerPrev.next) footerPrev.parent.insertBefore(footer, footerPrev.next);
-            else footerPrev.parent.appendChild(footer);
-          }
-        }
       } catch { /* best-effort restore */ }
 
       if (track.parentNode === root) root.removeChild(track);

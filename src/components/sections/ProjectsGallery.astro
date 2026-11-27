@@ -1,0 +1,54 @@
+---
+import ProjectVisual from '../ProjectVisual.astro';
+import type { ProjectEntry } from '../../data/project-gallery';
+
+interface Props {
+  projects: ProjectEntry[];
+}
+
+const { projects } = Astro.props;
+const year = new Date().getFullYear();
+---
+<main class="projects-archive section-pad" aria-labelledby="archive-title">
+  <a class="archive-back" href="/">← Back home</a>
+
+  <header class="archive-header">
+    <p class="archive-kicker">WORKS ARCHIVE / {projects.length} WORKS</p>
+    <h1 id="archive-title" class="archive-title">Works<span>.</span></h1>
+    <p class="archive-intro">A selection of systems, experiments, and digital work — each built to solve a real problem and hold up beyond the demo.</p>
+  </header>
+
+  <div class="archive-grid">
+    {projects.map((entry, index) => {
+      const project = entry.data;
+      const title = project.shortTitle ?? project.title;
+      const category = project.shortCategory ?? project.category;
+      return (
+        <a
+          href={`/projects/${entry.id}`}
+          class={`archive-card archive-${project.accent}`}
+          aria-label={`Open ${project.title} case study`}
+        >
+          <div class="archive-card-visual">
+            <ProjectVisual slug={entry.id} title={title} category={category} accent={project.accent} />
+            <span class="archive-card-index">{String(index + 1).padStart(2, '0')}</span>
+            <span class="archive-card-mark" aria-hidden="true">↗</span>
+          </div>
+          <div class="archive-card-meta">
+            <div class="archive-card-title-row">
+              <h2>{title}</h2>
+              <span class="archive-card-year">{project.year}</span>
+            </div>
+            <small>{category}</small>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+
+  <footer class="archive-footer">
+    <span>© {year} BAYU MUTAWAKKIL</span>
+    <span class="archive-footer-line"></span>
+    <span>SELECTED WORK 2023 — 2026</span>
+  </footer>
+</main>

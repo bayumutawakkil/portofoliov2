@@ -4,12 +4,13 @@ import { ClientRouter } from 'astro:transitions';
 const {
   title = 'Bayu Mutawakkil — Software Developer',
   description = 'Personal portfolio of Bayu Mutawakkil, Information Systems student and software developer.',
+  ogImage: customOgImage,
+  ogImageAlt = 'Bayu Mutawakkil — software developer portfolio',
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
 const canonical = new URL(Astro.url.pathname, siteUrl).toString();
-// TODO(placeholder): Ganti /bg-hero.jpg dengan gambar Open Graph khusus (1200x630) di public/
-const ogImage = new URL('/bg-hero.jpg', siteUrl).toString();
+const ogImage = new URL(customOgImage ?? '/bg-hero.jpg', siteUrl).toString();
 ---
 <!doctype html>
 <html lang="en">
@@ -26,7 +27,7 @@ const ogImage = new URL('/bg-hero.jpg', siteUrl).toString();
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:alt" content="Bayu Mutawakkil — software developer portfolio" />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

@@ -308,11 +308,11 @@ const init = () => {
       cursorCleanup = () => window.removeEventListener('pointermove', move);
     }
 
-    // ── 3D Laptop Asset (Lazy-loaded WebGL after initial idle) ───────
+    // ── 3D Laptop Asset (Lazy-loaded WebGL after initial idle, desktop only) ──
     let laptopController: LaptopController | null = null;
     let laptopDisposed = false;
     const laptopCanvas = document.querySelector<HTMLCanvasElement>('#laptop-canvas');
-    if (laptopCanvas) {
+    if (laptopCanvas && window.matchMedia('(min-width: 1024px)').matches && !reduceMotion) {
       const load3D = () => {
         if (laptopDisposed) return;
         import('./laptop-3d').then(({ initLaptop3D }) => {
