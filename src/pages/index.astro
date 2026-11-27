@@ -122,7 +122,7 @@ const personJsonLd = {
 
         <!-- On desktop, the title is anchored to the left and centered vertically above the slider. -->
         <div class="pointer-events-none relative z-[60] shrink-0 pt-2 text-left lg:absolute lg:left-[clamp(24px,7.1vw,112px)] lg:top-1/2 lg:-translate-y-1/2 lg:pt-0">
-          <h2 id="work-title" class="m-0 mt-1 font-[var(--display)] text-[clamp(3.25rem,16vw,4.75rem)] font-semibold leading-[0.86] tracking-[-0.06em] text-white [text-shadow:0_8px_28px_rgba(0,0,0,0.55),0_2px_8px_rgba(77,159,255,0.18)] lg:mt-2 lg:text-[clamp(56px,11vw,180px)] lg:leading-[0.82] lg:tracking-[-0.07em] lg:text-white"><ScrambleLabel client:visible text="Works" /></h2>
+          <h2 id="work-title" class="m-0 mt-1 font-[var(--display)] text-[clamp(3.25rem,16vw,4.75rem)] font-semibold leading-[0.86] tracking-[-0.06em] text-white [text-shadow:0_8px_28px_rgba(0,0,0,0.55),0_2px_8px_rgba(77,159,255,0.18)] lg:mt-2 lg:text-[clamp(56px,11vw,180px)] lg:leading-[0.82] lg:tracking-[-0.07em] lg:text-white"><ScrambleLabel client:idle text="Works" /></h2>
         </div>
 
         <!-- Slider: flex-1 + min-h-0 agar muat 100dvh; swipe horizontal untuk geser proyek -->
@@ -136,15 +136,13 @@ const personJsonLd = {
               return (
                 <article class={`project-card project-${project.accent}`} data-project-card data-category={category} data-gallery-card data-index={index}>
                   <a class="project-card-link" href={`/projects/${entry.id}`} aria-label={`Read case study: ${project.title}`}>
-                    <ProjectTilt client:visible>
-                      <div class="project-visual">
-                        <ProjectVisual slug={entry.id} title={title} category={category} accent={project.accent} />
-                        <div class="project-visual-wash"></div>
-                        <div class="visual-top"><span>CASE STUDY / {String(index + 1).padStart(2, '0')}</span><span>{project.year}</span></div>
-                        <span class="visual-watermark">{String(index + 1).padStart(2, '0')}</span>
-                        <span class="visual-open">OPEN PROJECT <b>↗</b></span>
-                      </div>
-                    </ProjectTilt>
+                    <div class="project-visual" data-project-tilt>
+                      <ProjectVisual slug={entry.id} title={title} category={category} accent={project.accent} />
+                      <div class="project-visual-wash"></div>
+                      <div class="visual-top"><span>CASE STUDY / {String(index + 1).padStart(2, '0')}</span><span>{project.year}</span></div>
+                      <span class="visual-watermark">{String(index + 1).padStart(2, '0')}</span>
+                      <span class="visual-open">OPEN PROJECT <b>↗</b></span>
+                    </div>
                     <div class="project-info">
                       <div class="project-meta"><span>{category}</span><span>{project.year}</span></div>
                       <div class="project-title-row"><h3>{title}</h3><span class="project-link" aria-hidden="true">↗</span></div>
@@ -170,13 +168,13 @@ const personJsonLd = {
       >
         <div class="mx-auto flex h-auto max-h-full min-h-0 w-full max-w-[1060px] flex-col gap-6 max-lg:gap-8 lg:my-auto lg:flex-row lg:items-center lg:gap-10">
           <!-- Judul: mobile horizontal/atas (tengah, full width); desktop vertikal di kiri -->
-          <div class="flex w-full shrink-0 items-center justify-center max-lg:text-center max-lg:mb-2 lg:h-auto lg:min-h-0 lg:w-[clamp(48px,14%,130px)] lg:justify-center lg:overflow-hidden">
-            <div class="flex items-center gap-3 max-lg:flex-col lg:min-h-0 lg:flex-col lg:gap-[clamp(6px,1vh,14px)]">
+          <div class="flex w-full shrink-0 items-center justify-center max-lg:text-center max-lg:mb-2 lg:h-auto lg:min-h-0 lg:w-[clamp(48px,14%,130px)] lg:justify-center">
+            <div class="flex items-center gap-3 max-lg:flex-col lg:min-h-0 lg:flex-row lg:gap-[clamp(6px,1vw,14px)]">
               <span class="section-number [writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180">03 — CAPABILITIES</span>
               <h2
                 id="expertise-title"
                 class="m-0 font-[var(--display)] text-[clamp(2.75rem,12vw,4.25rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-[#e9f2fc] [writing-mode:horizontal-tb] lg:rotate-180 lg:text-[clamp(2.2rem,7vh,5rem)] lg:leading-[0.86] lg:tracking-[-0.06em] lg:[writing-mode:vertical-rl]"
-              ><ScrambleLabel client:visible text="WHAT I BRING" /></h2>
+              ><ScrambleLabel client:idle text="WHAT I BRING" /></h2>
             </div>
           </div>
 

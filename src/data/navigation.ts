@@ -11,7 +11,7 @@ export type NavItem = {
 /** Single source of truth for primary navigation (desktop + mobile). */
 export const navigation: NavItem[] = [
   { id: 'about', label: 'About Me', index: '01' },
-  { id: 'projects', label: 'Works', index: '02', href: '/projects' },
+  { id: 'work', label: 'Works', index: '02' },
   { id: 'expertise', label: 'Expertise', index: '03' },
   { id: 'experience', label: 'Experience', index: '04' },
   { id: 'principles', label: 'Manifesto', index: '05' },

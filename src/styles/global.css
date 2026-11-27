@@ -729,7 +729,7 @@ body { color: var(--ice-text); }
 .site-header { background: rgba(33, 52, 72, .82); }
 .mobile-menu { background: #213448; }
 #work.work-section {
-  background: radial-gradient(circle at 50% 45%, rgba(84, 119, 146, 0.45) 0%, rgba(33, 52, 72, 0.6) 65%, rgba(33, 52, 72, 0.85) 100%);
+  background: transparent;
 }
 #work .project-card {
   background: rgba(84, 119, 146, .42);

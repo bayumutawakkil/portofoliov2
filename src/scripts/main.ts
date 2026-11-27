@@ -80,6 +80,30 @@ const init = () => {
     mobileMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
     const menuCleanup = () => document.removeEventListener('keydown', onMenuKeydown);
 
+    // ── Lightweight 3D tilt for project cards (no React island) ───────
+    const tiltCleanups: (() => void)[] = [];
+    if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      document.querySelectorAll<HTMLElement>('[data-project-tilt]').forEach((el) => {
+        const onMove = (e: PointerEvent) => {
+          const rect = el.getBoundingClientRect();
+          const px = (e.clientX - rect.left) / rect.width - 0.5;
+          const py = (e.clientY - rect.top) / rect.height - 0.5;
+          el.style.transform = `perspective(900px) rotateX(${(-py * 7).toFixed(2)}deg) rotateY(${(px * 7).toFixed(2)}deg)`;
+        };
+        const onLeave = () => {
+          el.style.transform = '';
+        };
+        el.style.transition = 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)';
+        el.addEventListener('pointermove', onMove);
+        el.addEventListener('pointerleave', onLeave);
+        tiltCleanups.push(() => {
+          el.removeEventListener('pointermove', onMove);
+          el.removeEventListener('pointerleave', onLeave);
+          el.style.transform = '';
+        });
+      });
+    }
+
     // ── Drag carousel (pointer only — no wheel scroll) ────────────────
     const gallery    = document.querySelector<HTMLElement>('[data-drag-gallery]');
     const galleryTrack = gallery?.querySelector<HTMLElement>('[data-gallery-track]');

@@ -20,8 +20,9 @@ const enterOnScroll = (
   targets: Element | Element[] | NodeListOf<Element>,
   trigger: Element | string,
   opts: gsap.TweenVars = {}
-) =>
-  gsap.fromTo(
+) => {
+  gsap.set(targets, { y: 0, opacity: 1 });
+  return gsap.fromTo(
     targets,
     { y: 32, opacity: 0 },
     {
@@ -29,10 +30,12 @@ const enterOnScroll = (
       opacity: 1,
       duration: 0.75,
       ease: 'power2.out',
+      immediateRender: false,
       scrollTrigger: { trigger, start: 'top 92%', once: true },
       ...opts,
     }
   );
+};
 
 export function initFullpage(root: HTMLElement): FullpageController {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
