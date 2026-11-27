@@ -1,5 +1,6 @@
 ---
 import { navigation } from '../data/navigation';
+import { ThemeToggle } from './interactive/ThemeToggle';
 
 const isHome = Astro.url.pathname === '/';
 /** Route items keep their absolute href; section items become anchors. */
@@ -11,7 +12,10 @@ const resolveHref = (item: (typeof navigation)[number]) =>
   <nav class="desktop-nav" aria-label="Main navigation">
     {navigation.map((item) => <a href={resolveHref(item)}>{item.label}</a>)}
   </nav>
-  <a class="header-availability" href={isHome ? '#contact' : '/#contact'}><span class="status-dot"></span> Available for opportunities</a>
+  <div class="flex items-center gap-3">
+    <a class="header-availability" href={isHome ? '#contact' : '/#contact'}><span class="status-dot"></span> Available for opportunities</a>
+    <ThemeToggle client:load />
+  </div>
   <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><span></span><span></span></button>
 </header>
 <div class="mobile-menu" id="site-menu" aria-label="Mobile navigation" data-mobile-menu>

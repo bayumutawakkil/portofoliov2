@@ -2,7 +2,6 @@ import * as React from "react";
 import { ArrowUpRight } from "lucide-react";
 import { GlowButton } from "@/components/interactive/unlumen-ui/glow";
 import { MagneticButton } from "@/components/interactive/unlumen-ui/magnetic-button";
-import { GlowingBadge } from "@/components/interactive/unlumen-ui/glowing-badge";
 import { Tilt } from "@/components/interactive/unlumen-ui/tilt";
 import { ShimmeringText } from "@/components/interactive/unlumen-ui/shimmering-text";
 import { ProgressiveBlur } from "@/components/interactive/unlumen-ui/progressive-blur";
@@ -12,11 +11,11 @@ export function HeroExploreButton() {
   return (
     <GlowButton
       mode="rotate"
-      colors={["#4d9fff", "#82d8ed", "#2563eb", "#4d9fff"]}
+      colors={["var(--blue)", "var(--cyan)", "var(--blue)", "var(--blue)"]}
       blur="medium"
       duration={6}
       glowScale={1.03}
-      className="h-[50px] gap-8 rounded-md bg-[#4d9fff] px-5 text-[12px] font-bold text-[#061321] hover:bg-[#8bc5ff]"
+      className="h-[50px] gap-8 rounded-md bg-[var(--blue)] px-5 text-[12px] font-bold text-[var(--bg)] hover:bg-[var(--blue)]"
       onClick={() => {
         if (document.documentElement.classList.contains("is-fullpage")) {
           window.dispatchEvent(
@@ -37,14 +36,17 @@ export function HeroExploreButton() {
 export function AvailabilityBadge({ label }: { label: string }) {
   return (
     <div className="mb-6 w-fit self-start">
-      <GlowingBadge
-        variant="success"
-        pulse
-        dot
-        className="w-fit border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-[var(--mono)] text-[10px] tracking-[0.16em] text-emerald-200"
-      >
-        {label}
-      </GlowingBadge>
+      <span className="relative inline-flex w-fit items-center gap-2 rounded-full border border-[color-mix(in_srgb,_var(--cyan)_32%,_transparent)] bg-[color-mix(in_srgb,_var(--cyan)_10%,_transparent)] px-3 py-1 font-[var(--mono)] text-[10px] tracking-[0.16em] text-[var(--cyan)]">
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full bg-[var(--blue)] opacity-25 blur-md"
+        />
+        <span className="relative inline-flex h-1.5 w-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--cyan)] opacity-60" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--cyan)]" />
+        </span>
+        <span className="relative">{label}</span>
+      </span>
     </div>
   );
 }
@@ -67,7 +69,7 @@ export function ContactActions({ email, cvUrl }: { email: string; cvUrl?: string
       <MagneticButton
         strength={0.35}
         radius={120}
-        className="h-12 rounded-md bg-[#4d9fff] px-6 text-[13px] font-bold text-[#061321] shadow-[0_8px_24px_rgba(77,159,255,0.25)] transition-colors hover:bg-[#8bc5ff]"
+        className="h-12 rounded-md bg-[var(--blue)] px-6 text-[13px] font-bold text-[var(--bg)] shadow-[0_8px_24px_color-mix(in_srgb,_var(--blue)_25%,_transparent)] transition-colors hover:bg-[var(--blue)]"
         onClick={() => {
           window.location.href = `mailto:${email}`;
         }}
@@ -79,7 +81,7 @@ export function ContactActions({ email, cvUrl }: { email: string; cvUrl?: string
         type="button"
         onClick={handleCopy}
         aria-label={`Copy email ${email}`}
-        className="inline-flex h-12 items-center gap-2 rounded-md border border-white/15 bg-white/[0.04] px-4 font-[var(--mono)] text-[11px] tracking-[0.06em] text-[#cde0f0] transition-colors hover:border-[#82d8ed]/50 hover:bg-white/10 hover:text-white"
+        className="inline-flex h-12 items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-4 font-[var(--mono)] text-[11px] tracking-[0.06em] text-[var(--ice-text)] transition-colors hover:border-[var(--cyan)]/50 hover:text-[var(--cyan)]"
       >
         <span role="status" aria-live="polite">
           {copied ? "Email copied" : "Copy email"}
@@ -89,7 +91,7 @@ export function ContactActions({ email, cvUrl }: { email: string; cvUrl?: string
         <a
           href={cvUrl}
           download
-          className="inline-flex h-12 items-center gap-2 rounded-md border border-white/15 bg-white/[0.04] px-4 font-[var(--mono)] text-[11px] tracking-[0.06em] text-[#cde0f0] transition-colors hover:border-[#82d8ed]/50 hover:bg-white/10 hover:text-white"
+          className="inline-flex h-12 items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-4 font-[var(--mono)] text-[11px] tracking-[0.06em] text-[var(--ice-text)] transition-colors hover:border-[var(--cyan)]/50 hover:text-[var(--cyan)]"
         >
           <span>Download CV</span>
         </a>
@@ -118,8 +120,8 @@ export function ShimmerLine({
       text={text}
       duration={3}
       repeatDelay={1.5}
-      color="#60758c"
-      shimmerColor="#b8dcff"
+      color="var(--ice-muted)"
+      shimmerColor="var(--ice-text)"
       className={className}
     />
   );

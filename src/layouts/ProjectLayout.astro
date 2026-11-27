@@ -67,11 +67,11 @@ const hasDemo = Boolean(project.data.demoUrl?.trim());
         {project.data.stack.length > 0 && (
           <div class="detail-tags">
             {project.data.stack.map((tag) => (
-              <Badge variant="outline" className="rounded-md border-white/15 bg-white/[0.03] px-2.5 py-1 font-[var(--mono)] text-[11px] text-[#c1d5e8]">{tag}</Badge>
+              <Badge variant="outline" className="rounded-md border-[var(--line)] bg-[var(--surface)] px-2.5 py-1 font-[var(--mono)] text-[11px] text-[var(--blue)]">{tag}</Badge>
             ))}
           </div>
         )}
-        <Separator className="my-8 bg-white/10" />
+        <Separator className="my-8 bg-[var(--line)]" />
 
         {project.data.metrics && project.data.metrics.length > 0 && (
           <section class="detail-metrics" aria-label="Project metrics">
@@ -142,7 +142,7 @@ const hasDemo = Boolean(project.data.demoUrl?.trim());
         <nav class="detail-next-nav" aria-label="Project navigation">
           {prev && (
             <a
-              class="detail-nav-link detail-nav-prev rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4d9fff]"
+              class="detail-nav-link detail-nav-prev rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--blue)]"
               href={`/projects/${prev.id}`}
             >
               <span class="detail-nav-label">PREVIOUS CASE STUDY</span>
@@ -154,7 +154,7 @@ const hasDemo = Boolean(project.data.demoUrl?.trim());
           )}
           {next && (
             <a
-              class="detail-nav-link detail-nav-next rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4d9fff]"
+              class="detail-nav-link detail-nav-next rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--blue)]"
               href={`/projects/${next.id}`}
             >
               <span class="detail-nav-label">NEXT CASE STUDY</span>

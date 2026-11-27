@@ -17,7 +17,7 @@ const ogImage = new URL(customOgImage ?? '/bg-hero.jpg', siteUrl).toString();
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#213448" />
+    <meta name="theme-color" content="#F7F5F0" />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
@@ -36,6 +36,16 @@ const ogImage = new URL(customOgImage ?? '/bg-hero.jpg', siteUrl).toString();
     <title>{title}</title>
     <ClientRouter />
     <script is:inline>
+      (() => {
+        try {
+          const saved = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const isDark = saved ? saved === 'dark' : prefersDark;
+          document.documentElement.classList.toggle('dark', isDark);
+        } catch {
+          document.documentElement.classList.add('dark');
+        }
+      })();
       // Reveal animations only run when JS is available. If the module fails to
       // boot, the load fallback removes the class so content is never stuck hidden.
       document.documentElement.classList.add('js-ready');

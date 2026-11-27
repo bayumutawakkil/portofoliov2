@@ -13,7 +13,7 @@ interface ClippedCircleProps {
 
 function ClippedCircle({
   className,
-  circleClassName = "bg-white/20",
+  circleClassName = "bg-[var(--line)]",
   circleSize = 400,
 }: ClippedCircleProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);

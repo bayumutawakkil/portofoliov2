@@ -106,7 +106,7 @@ export function TiltCard({
         />
       )}
 
-      <ClippedCircle circleClassName="bg-white" circleSize={800} />
+      <ClippedCircle circleClassName="bg-[var(--line)]" circleSize={800} />
     </Tilt>
   );
 

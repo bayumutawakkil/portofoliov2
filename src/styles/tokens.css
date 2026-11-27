@@ -1,54 +1,99 @@
 /* ── Design tokens ──────────────────────────────────────────────
    Single source of truth for palette, fonts, radii, and interaction
-   accents. Imported at the top of global.css.
-
-   Cascade order is preserved from the original stylesheet:
-   1. Base tokens (shadcn + layout)
-   2. Luminous Cyber palette overrides
-   3. Focus ring */
+   accents. Imported at the top of global.css. */
 
 :root {
   --radius: 0.625rem;
-  --background: #040b1a;
-  --foreground: #e9f2fc;
-  --card: rgba(255, 255, 255, 0.04);
-  --card-foreground: #e9f2fc;
-  --popover: #091827;
-  --popover-foreground: #e9f2fc;
-  --primary: #4d9fff;
-  --primary-foreground: #061321;
-  --secondary: rgba(255, 255, 255, 0.08);
-  --secondary-foreground: #e9f2fc;
-  --muted: #94B4C1;
-  --muted-foreground: #8fa3b8;
-  --accent: rgba(77, 159, 255, 0.14);
-  --accent-foreground: #e9f2fc;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.14);
-  --ring: #4d9fff;
-  --bg: #213448;
-  --panel: #547792;
-  --line: rgba(148, 180, 193, 0.22);
-  --blue: #547792;
-  --cyan: #94B4C1;
+
+  /* ── Light mode palette ─────────────────────────────────────────
+     Character: clean, editorial, cool-neutral.
+     Background stays near-white with a hint of cool grey so text
+     reads at max contrast and accents don't fight the surface.
+     Accent: deep ink-blue (#1A56A0) — confident, not aggressive.
+     Secondary accent: slate-teal (#2E6B8A) replaces forest-sage.    */
+  --background: #F5F6F8;
+  --foreground: #111318;
+  --card: #EDEEF1;
+  --card-foreground: #111318;
+  --popover: #EDEEF1;
+  --popover-foreground: #111318;
+  --primary: #1A56A0;
+  --primary-foreground: #F5F6F8;
+  --secondary: rgba(17, 19, 24, 0.06);
+  --secondary-foreground: #111318;
+  --muted: rgba(17, 19, 24, 0.06);
+  --muted-foreground: #4A5568;
+  --accent: rgba(26, 86, 160, 0.10);
+  --accent-foreground: #111318;
+  --destructive: #DC2626;
+  --destructive-foreground: #F5F6F8;
+  --border: rgba(17, 19, 24, 0.12);
+  --input: rgba(17, 19, 24, 0.14);
+  --ring: #1A56A0;
+
+  /* Surface & Border Aliases */
+  --bg: #F5F6F8;
+  --surface: #EDEEF1;
+  --panel: #EDEEF1;
+  --line: rgba(17, 19, 24, 0.12);
+
+  /* Palette used throughout global.css via --blue / --cyan / --ice-* */
+  --blue-primary: #1A56A0;
+  --blue: #1A56A0;
+  --sky: #2E6B8A;
+  --cyan: #2E6B8A;
+  --cyan-bright: #111318;
+  --indigo: #1A56A0;
+  --sage: #2E6B8A;
+  --ice-text: #111318;
+  --ice-muted: #4A5568;
+  --focus-ring: #1A56A0;
+
+  /* Ambient shadow on cards — replaces dark-mode glow */
+  --card-shadow: 0 2px 12px rgba(17,19,24,.07), 0 1px 3px rgba(17,19,24,.05);
+
   --display: 'Space Grotesk', sans-serif;
   --mono: 'IBM Plex Mono', monospace;
   font-family: 'DM Sans', sans-serif;
-  color: #ECEFCA;
-  background: #213448;
+  color: #111318;
+  background: #F5F6F8;
+  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
 
-/* ── Luminous Cyber Blue ─────────────────────────────────────────
-   Palette + interaction polish. Tilt-free: hover uses glow and a small
-   lift (the `translate` property composes with GSAP's `transform`). */
-:root {
-  --bg: #213448; --surface: rgba(84, 119, 146, .42); --border: rgba(148, 180, 193, .28);
-  --blue-primary: #547792; --blue: #547792; --sky: #94B4C1; --cyan: #94B4C1; --cyan-bright: #ECEFCA; --indigo: #547792;
-  --ice-text: #ECEFCA; --ice-muted: #94B4C1; --muted: #94B4C1;
+.dark {
+  --background: #121110;
+  --foreground: #F5F2EB;
+  --card: #1C1A17;
+  --card-foreground: #F5F2EB;
+  --popover: #1C1A17;
+  --popover-foreground: #F5F2EB;
+  --primary: #F59E0B;
+  --primary-foreground: #121110;
+  --secondary: rgba(245, 242, 235, 0.08);
+  --secondary-foreground: #F5F2EB;
+  --muted: #A8A29E;
+  --muted-foreground: #A8A29E;
+  --accent: rgba(245, 158, 11, 0.14);
+  --accent-foreground: #F5F2EB;
+  --border: rgba(245, 242, 235, 0.12);
+  --input: rgba(245, 242, 235, 0.14);
+  --ring: #F59E0B;
+  --bg: #121110;
+  --surface: #1C1A17;
+  --panel: #1C1A17;
+  --line: rgba(245, 242, 235, 0.14);
+  --blue-primary: #F59E0B;
+  --blue: #F59E0B;
+  --sky: #FBBF24;
+  --cyan: #FBBF24;
+  --cyan-bright: #F5F2EB;
+  --indigo: #F59E0B;
+  --ice-text: #F5F2EB;
+  --ice-muted: #A8A29E;
+  --focus-ring: #FBBF24;
+  color: #F5F2EB;
+  background: #121110;
+  color-scheme: dark;
 }
-
-:root { --focus-ring: #ECEFCA; }
